@@ -58,5 +58,4 @@ Cache.delete('some-cache', function(err, item) {
 });
 
 // You can also delete loaded items.
-// TODO: implement this.
 // cache.delete();
