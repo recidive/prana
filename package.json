@@ -1,0 +1,11 @@
+{
+  "name": "prana",
+  "version": "0.0.1",
+  "description": "Prana Micro Framework",
+  "keywords": [
+    "prana",
+    "framework"
+  ],
+  "repository": "git://github.com/recidive/prana",
+  "main": "prana",
+}
