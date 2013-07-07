@@ -6,6 +6,6 @@
     "prana",
     "framework"
   ],
-  "repository": "git://github.com/recidive/prana",
   "main": "prana",
+  "repository": "git://github.com/recidive/prana"
 }
