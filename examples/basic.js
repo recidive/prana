@@ -18,6 +18,14 @@ var Cache = application.type(new Prana.Type('cache', {
   keyProperty: 'key'
 }));
 
+// List all types to see the type we created, the 'type' type is a core type.
+var Type = application.type('type');
+
+Type.list({}, function(err, items) {
+  console.log('A list of types');
+  console.log(Object.keys(items));
+});
+
 // Create a cache item.
 var cache = new Cache({
   key: 'some-cache',
@@ -55,6 +63,12 @@ Cache.load('some-cache', function(err, item) {
 Cache.delete('some-cache', function(err, item) {
   console.log('Delete this single item');
   console.log(item);
+});
+
+// Retrieve a list of cached data again to check if the item was really removed.
+Cache.list({}, function(err, items) {
+  console.log('A list of items');
+  console.log(items);
 });
 
 // You can also delete loaded items.
