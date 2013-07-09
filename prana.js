@@ -27,6 +27,30 @@ var Prana = module.exports = function(settings) {
 
   // Extensions container.
   this.extensions = {};
+
+  // Add 'type' core type.
+  this.type(new Prana.Type('type', {
+    title: 'Type',
+    description: 'Types are the smallest thing on the system.',
+    storage: Prana.MemoryStorage,
+    storageSettings: {
+      // Set data as reference to this.types.
+      data: this.types
+    },
+    key: 'name'
+  }));
+
+  // Add 'extension' core type.
+  this.type(new Prana.Type('extension', {
+    title: 'Extension',
+    description: 'Extensions can extend every type on the system, as well as react on events.',
+    storage: Prana.MemoryStorage,
+    storageSettings: {
+      // Set data as reference to this.extensions.
+      data: this.extensions
+    },
+    key: 'name'
+  }));
 };
 
 util.inherits(Prana, EventEmitter);
