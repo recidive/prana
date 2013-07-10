@@ -4,6 +4,12 @@ Prana is a micro framework for building extensible applications with strong code
 
 Prana has some breakthrough concepts that makes building complex applications very easy. You can use Prana for building not only web applications but also other kind of applications, such as command line applications, sockets, etc.
 
+## Installation
+
+    $ npm install prana
+
+## Basic usage
+
 The Prana core is formed of types, events and extensions. You can define your own types, describing business objects of your application:
 
     var application = new Prana();
