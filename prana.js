@@ -8,6 +8,7 @@
  * Module dependencies.
  */
 var util = require('util');
+var async = require('async');
 var EventEmitter = require('events').EventEmitter;
 
 /**
@@ -105,5 +106,32 @@ Prana.prototype.extension = function(extension) {
   }
 
   // Otherwise set it.
-  return this.extensions[extension.name] = Prana.Extension.create(extension);
+  return this.extensions[extension.name] = extension;
+};
+
+/**
+ * Invoke a hook in all extensions that implement it.
+ *
+ * @param {String} hook Name of the hook to run.
+ * @param {...Mixed} arg Variable number of arguments to pass the hook
+ *   implementation.
+ * @param {Function} callback Callback to run after all implementations have
+ *   been invoked.
+ */
+Prana.prototype.invoke = function() {
+  var args = Array.prototype.slice.call(arguments);
+  var callback = args.pop();
+  var self = this;
+
+  async.each(Object.keys(this.extensions), function(extensionName, next) {
+    var extension = self.extensions[extensionName];
+
+    // Make a copy of arguments to avoid appending all next callbacks to the
+    // mains arguments object.
+    var argsCopy = args.slice();
+    argsCopy.push(next);
+
+    // Invoke extension hook.
+    extension.invoke.apply(extension, argsCopy);
+  }, callback);
 };

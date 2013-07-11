@@ -6,6 +6,9 @@
     "prana",
     "framework"
   ],
+  "dependencies": {
+    "async": "0.2.x"
+  },
   "main": "prana",
   "repository": "git://github.com/recidive/prana"
 }

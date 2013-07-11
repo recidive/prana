@@ -56,3 +56,78 @@ MyType.load(1, function(err, item) {
 ```
 
 For more examples check the examples folder.
+
+## Extensions
+
+Things start to get more interesting when we add some extensions to the loop.
+
+You can add extensions programmatically like this:
+
+```js
+// The prototype of our programmatically created extension.
+var myExtensionPrototype = {
+
+  // The list hook allow you to alter every item on the system they get listed.
+  list: function(type, items, callback) {
+    // Add a property to all types. You can use type to act only on certain
+    // items of a certain type.
+    for (var itemKey in items) {
+      items[itemKey].property = 'value';
+    }
+    callback();
+  }
+
+};
+
+// Add an extension programmatically.
+application.extension(new Prana.Extension(application, 'my-extension', myExtensionPrototype, {
+  title: 'My Extension',
+  description: 'This is just an example extension.'
+}));
+```
+
+You can also scan a directory for extensions:
+
+```js
+// Scan a folder for extensions.
+Prana.Extension.scan(__dirname + '/extensions', function(err, extensions) {
+  // Add all found extensions.
+  for (var extensionName in extensions) {
+    var extension = extensions[extensionName];
+    application.extension(new Prana.Extension(application, extensionName, extension.prototype, extension.info));
+  }
+});
+```
+
+This will look for two kind of files one named EXTENSIONNAME.extension.json that contains extension information. And EXTENSIONNAME.js that contains the extension protoype.
+
+For example, you can have a folder called 'example' in the 'extensions' dir with example.extension.json and example.js files with the following content:
+
+### example.extension.json
+
+```json
+{
+  "title": "Example Extension",
+  "description": "This is just an example extension."
+}
+```
+
+### example.js
+
+```js
+var example = module.exports = {
+
+  // The list hook allow you to alter every item on the system they get listed.
+  list: function(type, items, callback) {
+    // Add a property to all types. You can use type to act only on certain
+    // items of a certain type.
+    for (var itemKey in items) {
+      items[itemKey].property = 'value';
+    }
+    callback();
+  }
+
+};
+```
+
+For more examples check the examples folder.
