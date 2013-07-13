@@ -14,6 +14,36 @@ var Route = application.type(new Prana.Type('route', {
   keyProperty: 'path'
 }));
 
+
+// The prototype of our route altering extension.
+var routeAlteringExtensionPrototype = {
+
+  // The route() hook.
+  route: function(routes, callback) {
+    // Add a route.
+    routes['/test'] = {
+      path: '/test',
+      callback: function(request, response) {
+        response.send('Testing!');
+      }
+    };
+
+    // Alter the root (/) route.
+    routes['/'].callback = function(request, response) {
+      response.send('Hello Altered World!');
+    };
+
+    callback();
+  }
+
+};
+
+// Add an extension programmatically.
+application.extension(new Prana.Extension(application, 'route-altering-extension', routeAlteringExtensionPrototype, {
+  title: 'Route Altering Extension',
+  description: 'This is just an example extension that add/alter routes.'
+}));
+
 // Create the root route programmatically.
 var route = new Route({
   path: '/',
@@ -30,7 +60,7 @@ var server = express();
 
 // Retrieve and add all routes.
 Route.list({}, function(err, routes) {
-  //
+  // Add all routes.
   for (var path in routes) {
     server.all(path, routes[path].callback);
   }
