@@ -7,7 +7,9 @@ var Model = require('../../../lib/model');
  * Example extension prototype.
  */
 var example = module.exports = {
-  // Alter/add types.
+
+  // The type() hook.
+  // The type() hook can be used to alter or add types.
   type: function(types, callback) {
     // Add a new type.
     types['anotherExampleType'] = new Model.compile(this.application, Type('anotherExampleType', {
@@ -17,7 +19,9 @@ var example = module.exports = {
     callback();
   },
 
-  // Alter/add examples.
+  // The example() hook.
+  // The example() hook can be used to alter/add examples. This is automatically
+  // created for the example type created by the example.type.json.
   example: function(examples) {
     // Add new example object.
     examples['newExample'] = {
@@ -29,8 +33,10 @@ var example = module.exports = {
     examples['example'].someProperty = 'Some value.';
   },
 
-  // Alter/add items of all types.
+  // The list() hook.
+  // The list() hook can be used to alter/add items of all types.
   list: function(type, items, callback) {
+
     // Add a property to all types. You can use type to act only on certain
     // items of a certain type.
     for (var itemKey in items) {

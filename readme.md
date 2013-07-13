@@ -158,8 +158,8 @@ var example = module.exports = {
 
   // The list hook allow you to alter every item on the system they get listed.
   list: function(type, items, callback) {
-    // Add a property to all types. You can use type to act only on certain
-    // items of a certain type.
+    // Add a property to all types. You can use type to act only on items of a
+    // specific type.
     for (var itemKey in items) {
       items[itemKey].property = 'value';
     }

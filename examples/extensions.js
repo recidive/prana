@@ -2,11 +2,12 @@ var Prana = require('../prana');
 
 var application = new Prana();
 
-// The prototype of our programmatic created extension.
+// The prototype of our programmatically created extension.
 var myProgrammaticExtensionPrototype = {
 
-  // Add a type.
+  // The type() hook.
   type: function(types, callback) {
+    // Add a type.
     types['myProgrammaticExtensionType'] = Prana.Model.compile(application, new Prana.Type('myProgrammaticExtensionType', {
       title: 'My Programmatic Extension Type',
       description: 'A type created by a programmatically added extension.'
