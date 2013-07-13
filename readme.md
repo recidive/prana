@@ -57,6 +57,45 @@ MyType.load(1, function(err, item) {
 
 For more examples check the examples folder.
 
+## Events
+
+Both Prana instances (applications) and types are Event Emitters, this means you can add listeners to react on events emitted by these objects.
+
+There are list, load, save, delete events on both application and type scope.
+
+```js
+// Global event listener.
+application.on('save', function(type, item) {
+  console.log('Global save event fired. Item type: ' + type.name + '.');
+});
+
+// Define our type.
+var someType = new Prana.Type('someType', {
+  title: 'Some Type',
+  description: 'Some example type.'
+});
+
+// Type specific event listener.
+someType.on('save', function(item) {
+  console.log('Some Type specific save event fired.');
+});
+```
+
+You can then get the constructor of our type. Once save() method is called on a item all 'save' events are fired.
+
+```js
+var SomeType = application.type(someType);
+
+// Create a new Some Type item.
+var someTypeItem = new Cache({
+  key: 'some-key',
+  value: 'some-value'
+});
+
+// Save item to memory. Fire events.
+someTypeItem.save();
+```
+
 ## Extensions
 
 Things start to get more interesting when we add some extensions to the loop.
