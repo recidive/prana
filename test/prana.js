@@ -31,7 +31,7 @@ describe('Prana', function() {
     });
   });
 
-  it('should store a extension', function(done) {
+  it('should store an extension', function(done) {
     var prana = new Prana();
 
     var someExtension = prana.extension(new Prana.Extension(prana, 'some-extension', {}, {
