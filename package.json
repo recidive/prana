@@ -9,6 +9,9 @@
   "dependencies": {
     "async": "0.2.x"
   },
+  "devDependencies": {
+    "mocha": "*"
+  },
   "main": "prana",
   "repository": "git://github.com/recidive/prana"
 }
