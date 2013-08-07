@@ -1,8 +1,10 @@
 # Prana
 
-Prana is a micro framework for building extensible applications with strong code reusability features.
+Prana is a general purpose microframework for building extensible, modular applications and frameworks with strong code reusability features.
 
-Prana has some breakthrough concepts that makes building complex applications very easy. You can use Prana for building not only web applications but also other kind of applications, such as command line applications, sockets, etc.
+Prana has some breakthrough concepts that abstract the small pieces common to every application. You can use Prana for building not only web applications but also other kind of applications, such as command line applications, sockets, etc.
+
+Prana provides an unified API for interacting with objects, from configuration settings, object metadata to complex media objects, everything can be created and manipulated with Prana.
 
 ## Installation
 
