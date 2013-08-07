@@ -164,6 +164,10 @@ header h1 {
   display: none;
 }
 
+header img {
+  margin-bottom: 20px;
+}
+
 section {
   width:500px;
   float:right;
