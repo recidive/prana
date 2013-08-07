@@ -159,6 +159,11 @@ header ul a strong {
   color:#222;
 }
 
+/* Hide title */
+header h1 {
+  display: none;
+}
+
 section {
   width:500px;
   float:right;
