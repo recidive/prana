@@ -34,7 +34,11 @@ describe('Prana', function() {
   it('should store an extension', function(done) {
     var prana = new Prana();
 
-    var someExtension = prana.extension('some-extension', {});
+    var someExtension = prana.extension('some-extension', {
+      title: 'Some Extension',
+      description: 'This is just an extension for testing purposes.',
+      prototype: {}
+    });
     assert.ok(someExtension instanceof Prana.Extension);
 
     var someExtensionAgain = prana.extension('some-extension');

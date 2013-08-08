@@ -43,9 +43,10 @@ var routeAlteringExtensionPrototype = {
 };
 
 // Add an extension programmatically.
-application.extension('route-altering-extension', routeAlteringExtensionPrototype, {
+application.extension('route-altering-extension', {
   title: 'Route Altering Extension',
-  description: 'This is just an example extension that add/alter routes.'
+  description: 'This is just an example extension that add/alter routes.',
+  prototype: routeAlteringExtensionPrototype
 });
 
 // Create the root route programmatically.

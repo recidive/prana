@@ -119,9 +119,10 @@ var myExtensionPrototype = {
 };
 
 // Add an extension programmatically.
-application.extension('my-extension', myExtensionPrototype, {
+application.extension('my-extension', {
   title: 'My Extension',
-  description: 'This is just an example extension.'
+  description: 'This is just an example extension.',
+  prototype: myExtensionPrototype
 });
 ```
 
@@ -132,8 +133,8 @@ You can also scan a directory for extensions:
 Prana.Extension.scan(__dirname + '/extensions', function(err, extensions) {
   // Add all found extensions.
   for (var extensionName in extensions) {
-    var extension = extensions[extensionName];
-    application.extension(extensionName, extension.prototype, extension.info);
+    var settings = extensions[extensionName];
+    application.extension(extensionName, settings);
   }
 });
 ```

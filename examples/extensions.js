@@ -22,9 +22,10 @@ var myProgrammaticExtensionPrototype = {
 };
 
 // Add an extension programmatically.
-application.extension('my-programmatic-extension', myProgrammaticExtensionPrototype, {
+application.extension('my-programmatic-extension', {
   title: 'My Programmatic Extension',
-  description: 'This is just an example extension.'
+  description: 'This is just an example extension.',
+  prototype: myProgrammaticExtensionPrototype
 });
 
 // List all extensions to see the extension we created above. The 'extension'
@@ -50,8 +51,8 @@ Prana.Extension.scan(__dirname + '/extensions', function(err, extensions) {
 
   // Add all found extensions.
   for (var extensionName in extensions) {
-    var extension = extensions[extensionName];
-    application.extension(extensionName, extension.prototype, extension.info);
+    var settings = extensions[extensionName];
+    application.extension(extensionName, settings);
   }
 
   // List all extensions again. The 'extension' type is a core type.

@@ -39,9 +39,9 @@ var Prana = module.exports = function(settings) {
       // Set data as reference to this.types.
       data: this.types
     },
-    process: function(name, item) {
-      var controller = item.controller || Prana.Type;
-      var typeObject = new controller(name, item);
+    process: function(name, settings) {
+      var controller = settings.controller || Prana.Type;
+      var typeObject = new controller(name, settings);
       return Prana.Model.compile(self, typeObject);
     },
     key: 'name'
@@ -55,9 +55,9 @@ var Prana = module.exports = function(settings) {
       // Set data as reference to this.extensions.
       data: this.extensions
     },
-    process: function(name, item) {
-      var controller = item.controller || Prana.Extension;
-      return new controller(self, name, item);
+    process: function(name, settings) {
+      var controller = settings.controller || Prana.Extension;
+      return new controller(self, name, settings);
     },
     key: 'name'
   });
@@ -115,20 +115,18 @@ Prana.prototype.type = function(name, settings) {
  * Set or get an extension.
  *
  * @param {String} extension A string to be used to identify the extension.
- * @param {Object} prototype An object with hooks and other methods used to
- *   compose extension instance.
  * @param {Object} settings Extension settings.
  * @return {Extension} Extension instance.
  */
-Prana.prototype.extension = function(name, prototype, settings) {
+Prana.prototype.extension = function(name, settings) {
   // If there's no settings we want to get a extension.
-  if (!prototype) {
+  if (!settings) {
     // Return this as earlier as possible.
     return this.extensions[name];
   }
   else {
     // Run the process function from the 'extension' type.
-    return this.extensions[name] = this.types['extension'].type.process(name, prototype, settings);
+    return this.extensions[name] = this.types['extension'].type.process(name, settings);
   }
 };
 
