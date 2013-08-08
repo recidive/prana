@@ -52,7 +52,7 @@
 <div class="highlight"><pre><span class="kd">var</span> <span class="nx">Prana</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'prana'</span><span class="p">);</span>
 
 <span class="kd">var</span> <span class="nx">application</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Prana</span><span class="p">();</span>
-<span class="nx">application</span><span class="p">.</span><span class="nx">type</span><span class="p">(</span><span class="k">new</span> <span class="nx">Prana</span><span class="p">.</span><span class="nx">Type</span><span class="p">(</span><span class="s1">'myType'</span><span class="p">,</span> <span class="p">{</span>
+<span class="nx">application</span><span class="p">.</span><span class="nx">type</span><span class="p">(</span><span class="s1">'myType'</span><span class="p">,</span> <span class="p">{</span>
   <span class="nx">title</span><span class="o">:</span> <span class="s1">'My Type'</span><span class="p">,</span>
   <span class="nx">description</span><span class="o">:</span> <span class="s1">'This is one of my application types.'</span>
 <span class="p">});</span>
@@ -103,23 +103,21 @@
 <span class="p">});</span>
 
 <span class="c1">// Define our type.</span>
-<span class="kd">var</span> <span class="nx">someType</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Prana</span><span class="p">.</span><span class="nx">Type</span><span class="p">(</span><span class="s1">'someType'</span><span class="p">,</span> <span class="p">{</span>
+<span class="kd">var</span> <span class="nx">SomeType</span> <span class="o">=</span> <span class="nx">application</span><span class="p">.</span><span class="nx">type</span><span class="p">(</span><span class="s1">'someType'</span><span class="p">,</span> <span class="p">{</span>
   <span class="nx">title</span><span class="o">:</span> <span class="s1">'Some Type'</span><span class="p">,</span>
   <span class="nx">description</span><span class="o">:</span> <span class="s1">'Some example type.'</span>
 <span class="p">});</span>
 
 <span class="c1">// Type specific event listener.</span>
-<span class="nx">someType</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'save'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">SomeType</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'save'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Some Type specific save event fired.'</span><span class="p">);</span>
 <span class="p">});</span>
 </pre></div>
 
-<p>You can then get the constructor of our type. Once save() method is called on a item all 'save' events are fired.</p>
+<p>Once save() method is called on a item all 'save' events are fired.</p>
 
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">SomeType</span> <span class="o">=</span> <span class="nx">application</span><span class="p">.</span><span class="nx">type</span><span class="p">(</span><span class="nx">someType</span><span class="p">);</span>
-
-<span class="c1">// Create a new Some Type item.</span>
-<span class="kd">var</span> <span class="nx">someTypeItem</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cache</span><span class="p">({</span>
+<div class="highlight"><pre><span class="c1">// Create a new Some Type item.</span>
+<span class="kd">var</span> <span class="nx">someTypeItem</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SomeType</span><span class="p">({</span>
   <span class="nx">key</span><span class="o">:</span> <span class="s1">'some-key'</span><span class="p">,</span>
   <span class="nx">value</span><span class="o">:</span> <span class="s1">'some-value'</span>
 <span class="p">});</span>
@@ -151,10 +149,11 @@
 <span class="p">};</span>
 
 <span class="c1">// Add an extension programmatically.</span>
-<span class="nx">application</span><span class="p">.</span><span class="nx">extension</span><span class="p">(</span><span class="k">new</span> <span class="nx">Prana</span><span class="p">.</span><span class="nx">Extension</span><span class="p">(</span><span class="nx">application</span><span class="p">,</span> <span class="s1">'my-extension'</span><span class="p">,</span> <span class="nx">myExtensionPrototype</span><span class="p">,</span> <span class="p">{</span>
+<span class="nx">application</span><span class="p">.</span><span class="nx">extension</span><span class="p">(</span><span class="s1">'my-extension'</span><span class="p">,</span> <span class="p">{</span>
   <span class="nx">title</span><span class="o">:</span> <span class="s1">'My Extension'</span><span class="p">,</span>
-  <span class="nx">description</span><span class="o">:</span> <span class="s1">'This is just an example extension.'</span>
-<span class="p">}));</span>
+  <span class="nx">description</span><span class="o">:</span> <span class="s1">'This is just an example extension.'</span><span class="p">,</span>
+  <span class="nx">prototype</span><span class="o">:</span> <span class="nx">myExtensionPrototype</span>
+<span class="p">});</span>
 </pre></div>
 
 <p>You can also scan a directory for extensions:</p>
@@ -163,8 +162,8 @@
 <span class="nx">Prana</span><span class="p">.</span><span class="nx">Extension</span><span class="p">.</span><span class="nx">scan</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/extensions'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">extensions</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Add all found extensions.</span>
   <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">extensionName</span> <span class="k">in</span> <span class="nx">extensions</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">extension</span> <span class="o">=</span> <span class="nx">extensions</span><span class="p">[</span><span class="nx">extensionName</span><span class="p">];</span>
-    <span class="nx">application</span><span class="p">.</span><span class="nx">extension</span><span class="p">(</span><span class="k">new</span> <span class="nx">Prana</span><span class="p">.</span><span class="nx">Extension</span><span class="p">(</span><span class="nx">application</span><span class="p">,</span> <span class="nx">extensionName</span><span class="p">,</span> <span class="nx">extension</span><span class="p">.</span><span class="nx">prototype</span><span class="p">,</span> <span class="nx">extension</span><span class="p">.</span><span class="nx">info</span><span class="p">));</span>
+    <span class="kd">var</span> <span class="nx">settings</span> <span class="o">=</span> <span class="nx">extensions</span><span class="p">[</span><span class="nx">extensionName</span><span class="p">];</span>
+    <span class="nx">application</span><span class="p">.</span><span class="nx">extension</span><span class="p">(</span><span class="nx">extensionName</span><span class="p">,</span> <span class="nx">settings</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </pre></div>
