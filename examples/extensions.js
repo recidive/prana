@@ -7,23 +7,28 @@ var myProgrammaticExtensionPrototype = {
 
   // The type() hook.
   type: function(types, callback) {
-    // Add a type.
-    types['myProgrammaticExtensionType'] = Prana.Model.compile(application, new Prana.Type('myProgrammaticExtensionType', {
+    var newTypes = {};
+
+    // Add a type to this object and pass it as argument to the callback to have
+    // medata processed and a type created properly.
+    newTypes['myProgrammaticExtensionType'] = {
       title: 'My Programmatic Extension Type',
       description: 'A type created by a programmatically added extension.'
-    }));
-    callback();
+    };
+
+    callback(newTypes);
   }
 
 };
 
 // Add an extension programmatically.
-application.extension(new Prana.Extension(application, 'my-programmatic-extension', myProgrammaticExtensionPrototype, {
+application.extension('my-programmatic-extension', myProgrammaticExtensionPrototype, {
   title: 'My Programmatic Extension',
   description: 'This is just an example extension.'
-}));
+});
 
-// List all extensions to see the extension we created above. The 'extension' type is a core type.
+// List all extensions to see the extension we created above. The 'extension'
+// type is a core type.
 var Extension = application.type('extension');
 Extension.list({}, function(err, items) {
   console.log('A list of extensions');
@@ -46,7 +51,7 @@ Prana.Extension.scan(__dirname + '/extensions', function(err, extensions) {
   // Add all found extensions.
   for (var extensionName in extensions) {
     var extension = extensions[extensionName];
-    application.extension(new Prana.Extension(application, extensionName, extension.prototype, extension.info));
+    application.extension(extensionName, extension.prototype, extension.info);
   }
 
   // List all extensions again. The 'extension' type is a core type.

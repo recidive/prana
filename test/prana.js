@@ -6,10 +6,10 @@ describe('Prana', function() {
   it('should create a model for a type', function(done) {
     var prana = new Prana();
 
-    var SomeType = prana.type(new Prana.Type('someType', {
+    var SomeType = prana.type('someType', {
       title: 'Some Type',
       description: 'Some type for testing purposes.'
-    }));
+    });
 
     var someItem = new SomeType({
       key: 1,
@@ -34,10 +34,7 @@ describe('Prana', function() {
   it('should store an extension', function(done) {
     var prana = new Prana();
 
-    var someExtension = prana.extension(new Prana.Extension(prana, 'some-extension', {}, {
-      title: 'Some Extension',
-      description: 'Some extension for testing purposes.'
-    }));
+    var someExtension = prana.extension('some-extension', {});
     assert.ok(someExtension instanceof Prana.Extension);
 
     var someExtensionAgain = prana.extension('some-extension');

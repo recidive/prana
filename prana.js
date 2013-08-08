@@ -29,29 +29,38 @@ var Prana = module.exports = function(settings) {
   // Extensions container.
   this.extensions = {};
 
+  var self = this;
+
   // Add 'type' core type.
-  this.type(new Prana.Type('type', {
+  this.type('type', {
     title: 'Type',
     description: 'Types are the smallest thing on the system.',
-    storage: Prana.MemoryStorage,
     storageSettings: {
       // Set data as reference to this.types.
       data: this.types
     },
+    process: function(name, item) {
+      var controller = item.controller || Prana.Type;
+      var typeObject = new controller(name, item);
+      return Prana.Model.compile(self, typeObject);
+    },
     key: 'name'
-  }));
+  });
 
   // Add 'extension' core type.
-  this.type(new Prana.Type('extension', {
+  this.type('extension', {
     title: 'Extension',
     description: 'Extensions can extend every type on the system, as well as react on events.',
-    storage: Prana.MemoryStorage,
     storageSettings: {
       // Set data as reference to this.extensions.
       data: this.extensions
     },
+    process: function(name, item) {
+      var controller = item.controller || Prana.Extension;
+      return new controller(self, name, item);
+    },
     key: 'name'
-  }));
+  });
 };
 
 util.inherits(Prana, EventEmitter);
@@ -79,34 +88,48 @@ Prana.prototype.new = function(type, values) {
 /**
  * Set or get a type.
  *
- * @param {Type|String} type A type name string or Type object to add or set.
- * @return {Type} Type instance.
+ * @param {String} name A string to be used to identify the type.
+ * @param {Object} settings The settings for for the type to be created.
+ * @return {Model} A Model subclass created exclusivelly for this type.
  */
-Prana.prototype.type = function(type) {
-  // If type is a string, we want to get a type.
-  if (typeof type === 'string') {
-    return this.types[type];
+Prana.prototype.type = function(name, settings) {
+  // If there's no settings we want to get a type.
+  if (!settings) {
+    // Return this as earlier as possible.
+    return this.types[name];
   }
-
-  // Otherwise set and return it.
-  return this.types[type.name] = Prana.Model.compile(this, type);
+  else {
+    if (name === 'type') {
+      // We are creating the 'type' type, use process from settings.
+      return this.types[name] = settings.process(name, settings);
+    }
+    else {
+      // Run the process function from the 'type' type that's actually a model
+      // class instead of a type specific model instance.
+      return this.types[name] = this.types['type'].type.process(name, settings);
+    }
+  }
 };
 
 /**
  * Set or get an extension.
  *
- * @param {Extension|String} extension An extension name string or Extension
- *   object to add or set.
+ * @param {String} extension A string to be used to identify the extension.
+ * @param {Object} prototype An object with hooks and other methods used to
+ *   compose extension instance.
+ * @param {Object} settings Extension settings.
  * @return {Extension} Extension instance.
  */
-Prana.prototype.extension = function(extension) {
-  // If extension is a string, we want to get an extension.
-  if (typeof extension === 'string') {
-    return this.extensions[extension];
+Prana.prototype.extension = function(name, prototype, settings) {
+  // If there's no settings we want to get a extension.
+  if (!prototype) {
+    // Return this as earlier as possible.
+    return this.extensions[name];
   }
-
-  // Otherwise set it.
-  return this.extensions[extension.name] = extension;
+  else {
+    // Run the process function from the 'extension' type.
+    return this.extensions[name] = this.types['extension'].type.process(name, prototype, settings);
+  }
 };
 
 /**
@@ -123,11 +146,11 @@ Prana.prototype.invoke = function() {
   var callback = args.pop();
   var self = this;
 
-  async.each(Object.keys(this.extensions), function(extensionName, next) {
+  async.map(Object.keys(this.extensions), function(extensionName, next) {
     var extension = self.extensions[extensionName];
 
     // Make a copy of arguments to avoid appending all next callbacks to the
-    // mains arguments object.
+    // main arguments object.
     var argsCopy = args.slice();
     argsCopy.push(next);
 

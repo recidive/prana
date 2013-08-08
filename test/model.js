@@ -5,10 +5,10 @@ describe('Model', function() {
 
   var prana = new Prana();
 
-  var SomeType = prana.type(new Prana.Type('someType', {
+  var SomeType = prana.type('someType', {
     title: 'Some Type',
     description: 'Some type for testing purposes.'
-  }));
+  });
 
   it('should save and load an item', function(done) {
     var item = new SomeType({

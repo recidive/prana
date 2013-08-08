@@ -8,7 +8,7 @@ var application = new Prana();
 // This will auto generate a 'basic controller class' for us, we can also set
 // the 'controller' property when creating the type to override the standard
 // controller.
-var Cache = application.type(new Prana.Type('cache', {
+var Cache = application.type('cache', {
   title: 'Cache',
   description: 'A very simple key/value cache storage mechanism.',
 
@@ -16,7 +16,7 @@ var Cache = application.type(new Prana.Type('cache', {
   path: 'cache',
   storage: Prana.MemoryStorage,
   keyProperty: 'key'
-}));
+});
 
 // List all types to see the type we created, the 'type' type is a core type.
 var Type = application.type('type');

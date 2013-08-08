@@ -18,7 +18,7 @@ The Prana core is formed of types, events and extensions. You can define your ow
 var Prana = require('prana');
 
 var application = new Prana();
-application.type(new Prana.Type('myType', {
+application.type('myType', {
   title: 'My Type',
   description: 'This is one of my application types.'
 });
@@ -72,24 +72,22 @@ application.on('save', function(type, item) {
 });
 
 // Define our type.
-var someType = new Prana.Type('someType', {
+var SomeType = application.type('someType', {
   title: 'Some Type',
   description: 'Some example type.'
 });
 
 // Type specific event listener.
-someType.on('save', function(item) {
+SomeType.on('save', function(item) {
   console.log('Some Type specific save event fired.');
 });
 ```
 
-You can then get the constructor of our type. Once save() method is called on a item all 'save' events are fired.
+Once save() method is called on a item all 'save' events are fired.
 
 ```js
-var SomeType = application.type(someType);
-
 // Create a new Some Type item.
-var someTypeItem = new Cache({
+var someTypeItem = new SomeType({
   key: 'some-key',
   value: 'some-value'
 });
@@ -121,10 +119,10 @@ var myExtensionPrototype = {
 };
 
 // Add an extension programmatically.
-application.extension(new Prana.Extension(application, 'my-extension', myExtensionPrototype, {
+application.extension('my-extension', myExtensionPrototype, {
   title: 'My Extension',
   description: 'This is just an example extension.'
-}));
+});
 ```
 
 You can also scan a directory for extensions:
@@ -135,7 +133,7 @@ Prana.Extension.scan(__dirname + '/extensions', function(err, extensions) {
   // Add all found extensions.
   for (var extensionName in extensions) {
     var extension = extensions[extensionName];
-    application.extension(new Prana.Extension(application, extensionName, extension.prototype, extension.info));
+    application.extension(extensionName, extension.prototype, extension.info);
   }
 });
 ```

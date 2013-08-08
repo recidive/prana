@@ -5,10 +5,10 @@ var Prana = require('../prana');
 var application = new Prana();
 
 // Global event handler.
-application.on('load', function(type, item) {
-  // Do something with the loaded item.
-  console.log('Global load event fired. Item type: ' + type.name + '.');
-  console.log(item);
+application.on('list', function(type, items) {
+  // Do something with the loaded items.
+  console.log('Global list event fired.');
+  console.log(items);
 });
 
 // Global event handler.
@@ -18,27 +18,25 @@ application.on('save', function(type, item) {
   console.log(item);
 });
 
-var cacheType = new Prana.Type('cache', {
+// Create a very simple 'in memory' cache storage type.
+var Cache = application.type('cache', {
   title: 'Cache',
-  description: 'A very simple key/value cache storage mechanism.',
-})
+  description: 'A very simple key/value cache storage mechanism.'
+});
 
 // Type specific event handler.
-cacheType.on('save', function(item) {
+Cache.on('save', function(item) {
   // Do something with the just saved item.
   console.log('Cache type specific save event fired.');
   console.log(item);
 });
 
 // Type specific event handler.
-cacheType.on('list', function(item) {
-  // Do something with the just saved item.
+Cache.on('list', function(items) {
+  // Do something with the just listed itema.
   console.log('Cache type specific list event fired.');
-  console.log(item);
+  console.log(items);
 });
-
-// Create a very simple 'in memory' cache storage type.
-var Cache = application.type(cacheType);
 
 // Create a new cache item.
 var cache = new Cache({
