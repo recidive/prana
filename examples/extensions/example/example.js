@@ -29,9 +29,6 @@ var example = module.exports = {
       description: 'An added from an alter.'
     };
 
-    // Alter an existing example object.
-    examples['example'].someProperty = 'Some value.';
-
     // Pass newExamples to callback to get our items processed and properly
     // added to the examples container.
     callback(newExamples);
@@ -45,6 +42,11 @@ var example = module.exports = {
     // items of a certain type.
     for (var itemKey in items) {
       items[itemKey].anExampleProperty = 'someValue';
+    }
+
+    // Alter only existing example object of the example type.
+    if (type.name == 'example') {
+      items['example'].someProperty = 'Some value.';
     }
 
     callback();

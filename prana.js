@@ -10,6 +10,7 @@
 var util = require('util');
 var async = require('async');
 var EventEmitter = require('events').EventEmitter;
+var utils = require('./lib/utils');
 
 /**
  * Prana constructor.
@@ -155,4 +156,59 @@ Prana.prototype.invoke = function() {
     // Invoke extension hook.
     extension.invoke.apply(extension, argsCopy);
   }, callback);
+};
+
+/**
+ * Collect data from JSON files and type specific hooks.
+ *
+ * @param {Type} type Type object to collect data for.
+ * @param {Object} data Data container object.
+ * @param {Function} callback Callback to run after all data have been
+ *   collected.
+ */
+Prana.prototype.collect = function(type, data, callback) {
+  var result = {};
+  var self = this;
+
+  async.each(Object.keys(this.extensions), function(extensionName, next) {
+    var extension = self.extensions[extensionName];
+
+    // The extension.json files are handled differently.
+    if (type.name !== 'extension' && extension.settings.path) {
+      Prana.Extension.scanItems(extension.settings.path, type.name, function(err, foundItems) {
+        if (err) {
+          return next(err);
+        }
+
+        if (foundItems) {
+          utils.extend(result, foundItems);
+        }
+        extension.invoke(type.name, data, function(err, hookData) {
+          if (err) {
+            return next(err);
+          }
+
+          if (hookData) {
+            utils.extend(result, hookData);
+          }
+          next();
+        });
+      });
+    }
+    else {
+      // Invoke extension hook.
+      extension.invoke(type.name, data, function(err, hookData) {
+        if (err) {
+          return next(err);
+        }
+
+        if (hookData) {
+          utils.extend(result, hookData);
+        }
+        next();
+      });
+    }
+  }, function(err) {
+    callback(err, result)
+  });
 };

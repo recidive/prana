@@ -59,23 +59,40 @@ Prana.Extension.scan(__dirname + '/extensions', function(err, extensions) {
   Extension.list({}, function(err, items) {
     console.log('A list of extensions');
     console.log(items);
+
+
+    // List all types again to see the type created by our external extension.
+    Type.list({}, function(err, items) {
+      console.log('A list of types');
+      console.log(items);
+
+      // Get 'example' type model created by the example.type.json file.
+      var Example = application.type('example');
+      var ExampleItem = new Example({
+        key: 'test',
+        title: 'Test'
+      });
+      ExampleItem.save();
+      Example.list({}, function(err, items) {
+        console.log('A list of Example items');
+        console.log(items);
+      });
+
+    });
+
+    // Get 'myProgrammaticExtensionType' type created by the extension.
+    var MyProgrammaticExtensionType = application.type('myProgrammaticExtensionType');
+    var MyProgrammaticExtensionTypeItem = new MyProgrammaticExtensionType({
+      key: 'test',
+      title: 'Test'
+    });
+    MyProgrammaticExtensionTypeItem.save();
+    MyProgrammaticExtensionType.list({}, function(err, items) {
+      console.log('A list of MyProgrammaticExtensionType items');
+      console.log(items);
+    });
+
   });
 
-  // List all types again to see the type created by our external extension.
-  Type.list({}, function(err, items) {
-    console.log('A list of types');
-    console.log(items);
-  });
 
-  // Get type 'myProgrammaticExtensionType' created by the extension.
-  var MyProgrammaticExtensionType = application.type('myProgrammaticExtensionType');
-  var MyProgrammaticExtensionTypeItem = new MyProgrammaticExtensionType({
-    key: 'test',
-    title: 'Test'
-  });
-  MyProgrammaticExtensionTypeItem.save();
-  MyProgrammaticExtensionType.list({}, function(err, items) {
-    console.log('A list of MyProgrammaticExtensionType items');
-    console.log(items);
-  });
 });
