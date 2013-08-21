@@ -16,7 +16,7 @@ var myProgrammaticExtensionPrototype = {
       description: 'A type created by a programmatically added extension.'
     };
 
-    callback(newTypes);
+    callback(null, newTypes);
   }
 
 };
