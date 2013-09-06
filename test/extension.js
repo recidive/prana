@@ -26,7 +26,7 @@ describe('Extension', function() {
   });
 
   prana.init(function(extensions, types) {
-    it('should create a usable type', function(done) {
+    it('should create an usable type', function(done) {
       var TestProgrammaticExtensionType = prana.type('testProgrammaticExtensionType');
       var testProgrammaticExtensionType = new TestProgrammaticExtensionType({key: 1, val: 2});
       assert.ok(testProgrammaticExtensionType instanceof Prana.Model);

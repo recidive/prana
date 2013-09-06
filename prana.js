@@ -189,24 +189,27 @@ Prana.prototype.invoke = function() {
  *   collected.
  */
 Prana.prototype.collect = function(type, data, callback) {
-  var result = {};
-  var self = this;
-
   // The extension type don't allow collecting.
   if (type.name == 'extension') {
     return callback();
   }
 
+  var result = {};
+  var self = this;
+
+  // Loop over all extensions to collect their items.
   async.each(Object.keys(this.extensions), function(extensionName, next) {
     var extension = self.extensions[extensionName];
 
     if (extension.settings.path) {
+      // Scan for JSON files for this type.
       Prana.Extension.scanItems(extension.settings.path, type.name, function(err, foundItems) {
         if (err) {
           return next(err);
         }
 
         if (foundItems) {
+          // If items was found add them to the result.
           utils.extend(result, foundItems);
         }
 
@@ -217,16 +220,19 @@ Prana.prototype.collect = function(type, data, callback) {
       next();
     }
   }, function(err) {
+    // Process all items from JSON files.
     Prana.Type.processAll(type, result, data);
 
+    // Invoke type hooks on all modules.
     self.invoke(type.name, data, function(err, hookData) {
       if (err) {
         return callback(err);
       }
 
       if (hookData) {
-        // Each hook can return many items.
+        // Each hook implemention can return many items.
         hookData.forEach(function(items) {
+          // Process each set of items.
           Prana.Type.processAll(type, items, data);
         });
       }
