@@ -74,6 +74,27 @@ Prana.Model = require('./lib/model');
 Prana.Extension = require('./lib/extension');
 
 /**
+ * Make sure all extensions and types are loaded.
+ *
+ * @param {Function} callback Callback to run after prana was initialized.
+ */
+Prana.prototype.init = function(callback) {
+  var self = this;
+  async.mapSeries(['extension', 'type'], function(typeName, next) {
+    var TypeModel = self.type(typeName);
+    // Just calling this will set this.extension and this.type vars since those
+    // vars were passed to storage settings.
+    TypeModel.list({}, next);
+  },
+  function(err, results) {
+    // Run init hook on all modules.
+    self.invoke('init', self, function() {
+      callback.apply(self, results);
+    })
+  });
+};
+
+/**
  * Create new type specific objects.
  *
  * @param {String} type A type name string.
@@ -159,7 +180,8 @@ Prana.prototype.invoke = function() {
 };
 
 /**
- * Collect data from JSON files and type specific hooks.
+ * Collect data from JSON files and type specific hooks and add them to the data
+ * container object.
  *
  * @param {Type} type Type object to collect data for.
  * @param {Object} data Data container object.
@@ -170,11 +192,15 @@ Prana.prototype.collect = function(type, data, callback) {
   var result = {};
   var self = this;
 
+  // The extension type don't allow collecting.
+  if (type.name == 'extension') {
+    return callback();
+  }
+
   async.each(Object.keys(this.extensions), function(extensionName, next) {
     var extension = self.extensions[extensionName];
 
-    // The extension.json files are handled differently.
-    if (type.name !== 'extension' && extension.settings.path) {
+    if (extension.settings.path) {
       Prana.Extension.scanItems(extension.settings.path, type.name, function(err, foundItems) {
         if (err) {
           return next(err);
@@ -183,32 +209,30 @@ Prana.prototype.collect = function(type, data, callback) {
         if (foundItems) {
           utils.extend(result, foundItems);
         }
-        extension.invoke(type.name, data, function(err, hookData) {
-          if (err) {
-            return next(err);
-          }
 
-          if (hookData) {
-            utils.extend(result, hookData);
-          }
-          next();
-        });
-      });
-    }
-    else {
-      // Invoke extension hook.
-      extension.invoke(type.name, data, function(err, hookData) {
-        if (err) {
-          return next(err);
-        }
-
-        if (hookData) {
-          utils.extend(result, hookData);
-        }
         next();
       });
     }
+    else {
+      next();
+    }
   }, function(err) {
-    callback(err, result)
+    Prana.Type.processAll(type, result, data);
+
+    self.invoke(type.name, data, function(err, hookData) {
+      if (err) {
+        return callback(err);
+      }
+
+      if (hookData) {
+        // Each hook can return many items.
+        hookData.forEach(function(items) {
+          Prana.Type.processAll(type, items, data);
+        });
+      }
+
+      callback(err);
+    });
+
   });
 };

@@ -8,13 +8,16 @@ var example = module.exports = {
   type: function(types, callback) {
     var newTypes = {};
 
+    // Show we can alter the type created by the JSON file on this same module.
+    types.example.propertyAddedFromSameModule = 'Some value';
+
     // Add a new type.
     newTypes['anotherExampleType'] = {
       title: 'Another example type',
       description: 'Another example type created by an extension'
     };
 
-    callback(newTypes);
+    callback(null, newTypes);
   },
 
   // The example() hook.
@@ -31,7 +34,7 @@ var example = module.exports = {
 
     // Pass newExamples to callback to get our items processed and properly
     // added to the examples container.
-    callback(newExamples);
+    callback(null, newExamples);
   },
 
   // The list() hook.

@@ -37,7 +37,7 @@ var routeAlteringExtensionPrototype = {
       response.send('Hello Altered World!');
     };
 
-    callback(newRoutes);
+    callback(null, newRoutes);
   }
 
 };
