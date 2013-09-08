@@ -14,7 +14,7 @@ var example = module.exports = {
     // Add a new type.
     newTypes['anotherExampleType'] = {
       title: 'Another example type',
-      description: 'Another example type created by an extension'
+      description: 'Another example type created by an extension.'
     };
 
     callback(null, newTypes);
@@ -29,7 +29,7 @@ var example = module.exports = {
     // Add new example object.
     newExamples['newExample'] = {
       title: 'A new example',
-      description: 'An added from an alter.'
+      description: 'A new example item added from a type hook.'
     };
 
     // Pass newExamples to callback to get our items processed and properly
