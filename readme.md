@@ -130,7 +130,7 @@ You can also scan a directory for extensions:
 
 ```js
 // Scan a folder for extensions.
-Prana.Extension.scan(__dirname + '/extensions', function(err, extensions) {
+Prana.Extension.scanExtensions(__dirname + '/extensions', function(err, extensions) {
   // Add all found extensions.
   for (var extensionName in extensions) {
     var settings = extensions[extensionName];

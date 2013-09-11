@@ -29,7 +29,7 @@ application.extension('my-programmatic-extension', {
 });
 
 // Scan a folder for extensions.
-Prana.Extension.scan(__dirname + '/extensions', function(err, extensions) {
+Prana.Extension.scanExtensions(__dirname + '/extensions', function(err, extensions) {
   console.log('Found extensions');
   console.log(extensions);
 
