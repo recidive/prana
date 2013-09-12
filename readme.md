@@ -129,13 +129,10 @@ application.extension('my-extension', {
 You can also scan a directory for extensions:
 
 ```js
-// Scan a folder for extensions.
-Prana.Extension.scanExtensions(__dirname + '/extensions', function(err, extensions) {
-  // Add all found extensions.
-  for (var extensionName in extensions) {
-    var settings = extensions[extensionName];
-    application.extension(extensionName, settings);
-  }
+// Scan a folder for extensions and add them.
+application.loadExtensions(__dirname + '/extensions', function(err, extensions) {
+  // Do something with the just loaded extensions.
+  console.log('Loaded %d extensions.', Object.keys(extensions).length);
 });
 ```
 

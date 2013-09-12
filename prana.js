@@ -8,6 +8,8 @@
  * Module dependencies.
  */
 var util = require('util');
+var fs = require('fs');
+var path = require('path');
 var async = require('async');
 var EventEmitter = require('events').EventEmitter;
 var utils = require('./lib/utils');
@@ -22,7 +24,14 @@ var utils = require('./lib/utils');
 var Prana = module.exports = function(settings) {
   EventEmitter.call(this);
 
-  this.settings = settings;
+  this.settings = {
+    extensionFileSuffix: '.extension.json',
+    commonDependencies: []
+  };
+
+  if (settings) {
+    utils.extend(this.settings, settings);
+  }
 
   // Types container.
   this.types = {};
@@ -150,6 +159,107 @@ Prana.prototype.extension = function(name, settings) {
     // Run the process function from the 'extension' type.
     return this.extensions[name] = this.types['extension'].type.process(name, settings);
   }
+};
+
+/**
+ * Scan the file system for extensions.
+ *
+ * @param {String} dir Path to extensions container directory.
+ * @param {Function} callback Function to run when data is returned.
+ */
+Prana.prototype.loadExtensions = function(dir, callback) {
+  var self = this;
+  var foundExtensions = {};
+
+  // Scan directory for JSON files matching settings.extensionFileSuffix.
+  Prana.Extension.scan(dir, this.settings.extensionFileSuffix, function(file, data, next) {
+    // Build extension info.
+    var extensionInfo = JSON.parse(data);
+    extensionInfo.path = path.dirname(file);
+    extensionInfo.name = extensionInfo.name || path.basename(file, self.settings.extensionFileSuffix);
+
+    // Set dependency chain merging dependencies and common dependencies if any.
+    extensionInfo.dependencyChain = self.settings.commonDependencies.concat([]);
+    if (extensionInfo.dependencies) {
+      extensionInfo.dependencies.forEach(function(dependency) {
+        if (extensionInfo.dependencyChain.indexOf(dependency) === -1) {
+          extensionInfo.dependencyChain.push(dependency);
+        }
+      });
+    }
+
+    // In the case we are enabling a module that's in setting.commonDependencies
+    // we need to remove the extension from it's own list of dependencies.
+    var index = extensionInfo.dependencyChain.indexOf(extensionInfo.name);
+    if (index !== -1) {
+      extensionInfo.dependencyChain.splice(index, 1);
+    }
+
+    // Add to found extensions.
+    foundExtensions[extensionInfo.name] = extensionInfo;
+
+    next();
+  }, function(err) {
+    if (err) {
+      return callback(err);
+    }
+
+    // If settings.extensions is not set, enabled all extensions found.
+    var enabled = self.settings.extensions ? Object.keys(self.settings.extensions) : Object.keys(foundExtensions);
+    var chains = {};
+    var enabledExtensions = {};
+    async.each(enabled, function(extensionName, next) {
+      if (!foundExtensions[extensionName]) {
+        return next(new Error('Extension not found ' + extensionName + '.'));
+      }
+
+      var extensionInfo = foundExtensions[extensionName];
+
+      // Check if there are missing dependecies.
+      var missingDependencies = extensionInfo.dependencyChain.filter(function(dependency) {
+        return !foundExtensions[dependency];
+      });
+
+      // Fail if there are missing dependencies.
+      if (missingDependencies.length > 0) {
+        return next(new Error('Missing dependecies for ' + extensionName + ' extension: ' + missingDependencies.join(', ') + '.'));
+      }
+
+      // Build extension prototype.
+      var prototypeFile = extensionInfo.path + '/' + extensionInfo.name + '.js';
+      fs.exists(prototypeFile, function(exists) {
+        // Allow extensions without a prototype. E.g. for feature extensions
+        // that just have JSON files with some resources.
+        extensionInfo.prototype = exists ? require(prototypeFile) : {};
+        foundExtensions[extensionInfo.name] = extensionInfo;
+
+        // Add extension dependencies and initialization function to the
+        // dependency chains.
+        chains[extensionInfo.name] = extensionInfo.dependencyChain.concat([function(next) {
+          // Get module settings from application settings and add module info
+          // to that.
+          settings = self.settings.extensions ? self.settings.extensions[extensionInfo.name] : {};
+          settings.info = extensionInfo;
+
+          // Initialize and add the module instance to the application.
+          enabledExtensions[extensionInfo.name] = self.extension(extensionInfo.name, extensionInfo, settings);
+
+          next();
+        }]);
+        next();
+      });
+    }, function (err) {
+      if (err) {
+        return callback(err);
+      }
+
+      // Execute all initialization functions declared above taking into
+      // account module dependencies.
+      async.auto(chains, function(err) {
+        callback(err, enabledExtensions);
+      });
+    });
+  });
 };
 
 /**

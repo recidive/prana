@@ -29,15 +29,14 @@ application.extension('my-programmatic-extension', {
 });
 
 // Scan a folder for extensions.
-Prana.Extension.scanExtensions(__dirname + '/extensions', function(err, extensions) {
+application.loadExtensions(__dirname + '/extensions', function(err, extensions) {
+  if (err) {
+    throw err;
+  }
+
+  console.log('Loaded %d extensions.', Object.keys(extensions).length);
   console.log('Found extensions');
   console.log(extensions);
-
-  // Add all found extensions.
-  for (var extensionName in extensions) {
-    var settings = extensions[extensionName];
-    application.extension(extensionName, settings);
-  }
 
   // When using extensions it's better to call init() to make sure all
   // extensions and types are loaded.
