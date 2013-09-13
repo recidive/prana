@@ -14,7 +14,23 @@ var example = module.exports = {
     // Add a new type.
     newTypes['anotherExampleType'] = {
       title: 'Another example type',
-      description: 'Another example type created by an extension.'
+      description: 'Another example type created by an extension.',
+      methods: {
+        formattedTitle: function() {
+          return '<h1>' + this.title + '</h1>';
+        }
+      },
+      statics: {
+        customList: function(callback) {
+          this.list({}, callback);
+        }
+      },
+      listeners: {
+        save: function(item) {
+          console.log('Event listener from type settings');
+          console.log('Item saved, type: ' + item.type.name);
+        }
+      }
     };
 
     callback(null, newTypes);

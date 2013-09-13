@@ -85,6 +85,22 @@ application.loadExtensions(__dirname + '/extensions', function(err, extensions) 
           console.log(items);
         });
       });
+
+      // Get 'anotherExampleType' type created by the Example scanned extension.
+      var AnotherExampleType = application.type('anotherExampleType');
+      var anotherExampleTypeItem = new AnotherExampleType({
+        key: 'test',
+        title: 'Test'
+      });
+      anotherExampleTypeItem.save(function(err, item) {
+        console.log('Formatted item title, from a method added from type settings: ' + item.formattedTitle());
+        // list MyProgrammaticExtensionType items.
+        AnotherExampleType.customList(function(err, items) {
+          console.log('A custom list of AnotherExampleType items made from a static method added from type settings');
+          console.log(items);
+        });
+      });
+
     });
   });
 });
