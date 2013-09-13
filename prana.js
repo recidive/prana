@@ -26,7 +26,8 @@ var Prana = module.exports = function(settings) {
 
   this.settings = {
     extensionFileSuffix: '.extension.json',
-    commonDependencies: []
+    commonDependencies: [],
+    extensions: null
   };
 
   if (settings) {
