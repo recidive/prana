@@ -180,6 +180,8 @@ Prana.prototype.loadExtensions = function(dir, callback) {
     extensionInfo.name = extensionInfo.name || path.basename(file, self.settings.extensionFileSuffix);
 
     // Set dependency chain merging dependencies and common dependencies if any.
+    // Clone settings.commonDependencies array to avoid affecting other
+    // applications.
     extensionInfo.dependencyChain = self.settings.commonDependencies.concat([]);
     if (extensionInfo.dependencies) {
       extensionInfo.dependencies.forEach(function(dependency) {
