@@ -175,31 +175,31 @@ Prana.prototype.loadExtensions = function(dir, callback) {
   // Scan directory for JSON files matching settings.extensionFileSuffix.
   Prana.Extension.scan(dir, this.settings.extensionFileSuffix, function(file, data, next) {
     // Build extension info.
-    var extensionInfo = JSON.parse(data);
-    extensionInfo.path = path.dirname(file);
-    extensionInfo.name = extensionInfo.name || path.basename(file, self.settings.extensionFileSuffix);
+    var settings = JSON.parse(data);
+    settings.path = path.dirname(file);
+    settings.name = settings.name || path.basename(file, self.settings.extensionFileSuffix);
 
     // Set dependency chain merging dependencies and common dependencies if any.
     // Clone settings.commonDependencies array to avoid affecting other
     // applications.
-    extensionInfo.dependencyChain = self.settings.commonDependencies.concat([]);
-    if (extensionInfo.dependencies) {
-      extensionInfo.dependencies.forEach(function(dependency) {
-        if (extensionInfo.dependencyChain.indexOf(dependency) === -1) {
-          extensionInfo.dependencyChain.push(dependency);
+    settings.dependencyChain = self.settings.commonDependencies.concat([]);
+    if (settings.dependencies) {
+      settings.dependencies.forEach(function(dependency) {
+        if (settings.dependencyChain.indexOf(dependency) === -1) {
+          settings.dependencyChain.push(dependency);
         }
       });
     }
 
     // In the case we are enabling a module that's in setting.commonDependencies
     // we need to remove the extension from it's own list of dependencies.
-    var index = extensionInfo.dependencyChain.indexOf(extensionInfo.name);
+    var index = settings.dependencyChain.indexOf(settings.name);
     if (index !== -1) {
-      extensionInfo.dependencyChain.splice(index, 1);
+      settings.dependencyChain.splice(index, 1);
     }
 
     // Add to found extensions.
-    foundExtensions[extensionInfo.name] = extensionInfo;
+    foundExtensions[settings.name] = settings;
 
     next();
   }, function(err) {
@@ -216,10 +216,10 @@ Prana.prototype.loadExtensions = function(dir, callback) {
         return next(new Error('Extension not found ' + extensionName + '.'));
       }
 
-      var extensionInfo = foundExtensions[extensionName];
+      var settings = foundExtensions[extensionName];
 
       // Check if there are missing dependecies.
-      var missingDependencies = extensionInfo.dependencyChain.filter(function(dependency) {
+      var missingDependencies = settings.dependencyChain.filter(function(dependency) {
         return !foundExtensions[dependency];
       });
 
@@ -229,23 +229,23 @@ Prana.prototype.loadExtensions = function(dir, callback) {
       }
 
       // Build extension prototype.
-      var prototypeFile = extensionInfo.path + '/' + extensionInfo.name + '.js';
+      var prototypeFile = settings.path + '/' + settings.name + '.js';
       fs.exists(prototypeFile, function(exists) {
         // Allow extensions without a prototype. E.g. for feature extensions
         // that just have JSON files with some resources.
-        extensionInfo.prototype = exists ? require(prototypeFile) : {};
-        foundExtensions[extensionInfo.name] = extensionInfo;
+        settings.prototype = exists ? require(prototypeFile) : {};
+        foundExtensions[settings.name] = settings;
 
         // Add extension dependencies and initialization function to the
-        // dependency chains.
-        chains[extensionInfo.name] = extensionInfo.dependencyChain.concat([function(next) {
+        // dependency chains, without changing settings.dependencyChain.
+        chains[settings.name] = settings.dependencyChain.concat([function(next) {
           // Get module settings from application settings and add module info
           // to that.
-          settings = self.settings.extensions ? self.settings.extensions[extensionInfo.name] : {};
-          settings.info = extensionInfo;
+          var instanceSettings = self.settings.extensions ? self.settings.extensions[settings.name] : {};
+          utils.extend(settings, instanceSettings);
 
           // Initialize and add the module instance to the application.
-          enabledExtensions[extensionInfo.name] = self.extension(extensionInfo.name, extensionInfo, settings);
+          enabledExtensions[settings.name] = self.extension(settings.name, settings);
 
           next();
         }]);
@@ -278,18 +278,40 @@ Prana.prototype.invoke = function() {
   var args = Array.prototype.slice.call(arguments);
   var callback = args.pop();
   var self = this;
+  var chains = {};
 
   async.map(Object.keys(this.extensions), function(extensionName, next) {
-    var extension = self.extensions[extensionName];
-
     // Make a copy of arguments to avoid appending all next callbacks to the
     // main arguments object.
     var argsCopy = args.slice();
-    argsCopy.push(next);
+    var extension = self.extensions[extensionName];
+    var settings = extension.settings;
+    var extensionInvoke = function(next) {
+      argsCopy.push(next);
 
-    // Invoke extension hook.
-    extension.invoke.apply(extension, argsCopy);
-  }, callback);
+      // Invoke extension hook.
+      extension.invoke.apply(extension, argsCopy);
+    };
+
+    if (settings.dependencyChain) {
+      // Clone extension dependency chain and add invocation function to the
+      // dependency chains, without changing settings.dependencyChain.
+      chains[extensionName] = settings.dependencyChain.concat([extensionInvoke]);
+    }
+    else {
+      // Module doesn't have any dependencies.
+      chains[extensionName] = extensionInvoke;
+    }
+
+    next();
+  }, function (err) {
+    if (err) {
+      return callback(err);
+    }
+
+    // Execute all hooks taking into account module dependencies.
+    async.auto(chains, callback);
+  });
 };
 
 /**
@@ -344,10 +366,10 @@ Prana.prototype.collect = function(type, data, callback) {
 
       if (hookData) {
         // Each hook implemention can return many items.
-        hookData.forEach(function(items) {
+        for (var extensionName in hookData) {
           // Process each set of items.
-          Prana.Type.processAll(type, items, data);
-        });
+          Prana.Type.processAll(type, hookData[extensionName], data);
+        }
       }
 
       callback(err);
