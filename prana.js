@@ -52,7 +52,7 @@ var Prana = module.exports = function(settings) {
     },
     process: function(name, settings) {
       var controller = settings.controller || Prana.Type;
-      var typeObject = new controller(name, settings);
+      var typeObject = new controller(self, name, settings);
       return Prana.Model.compile(self, typeObject);
     },
     key: 'name'
