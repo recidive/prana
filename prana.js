@@ -281,12 +281,12 @@ Prana.prototype.invoke = function() {
   var chains = {};
 
   async.map(Object.keys(this.extensions), function(extensionName, next) {
-    // Make a copy of arguments to avoid appending all next callbacks to the
-    // main arguments object.
-    var argsCopy = args.slice();
     var extension = self.extensions[extensionName];
     var settings = extension.settings;
     var extensionInvoke = function(next) {
+      // Make a copy of arguments to avoid appending all next callbacks to the
+      // main arguments object.
+      var argsCopy = args.slice();
       argsCopy.push(next);
 
       // Invoke extension hook.
