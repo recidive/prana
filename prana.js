@@ -97,6 +97,10 @@ Prana.prototype.init = function(callback) {
     TypeModel.list({}, next);
   },
   function(err, results) {
+    if (err) {
+      return callback(err);
+    }
+
     // Run init hook on all modules.
     self.invoke('init', self, function() {
       callback.apply(self, results);
