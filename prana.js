@@ -169,44 +169,56 @@ Prana.prototype.extension = function(name, settings) {
 /**
  * Scan the file system for extensions.
  *
- * @param {String} dir Path to extensions container directory.
+ * @param {String|Array} dir Path to extensions container directory this can be
+ *   also an array of paths.
  * @param {Function} callback Function to run when data is returned.
  */
 Prana.prototype.loadExtensions = function(dir, callback) {
   var self = this;
   var foundExtensions = {};
 
-  // Scan directory for JSON files matching settings.extensionFileSuffix.
-  Prana.Extension.scan(dir, this.settings.extensionFileSuffix, function(file, data, next) {
-    // Build extension info.
-    var settings = JSON.parse(data);
-    settings.path = path.dirname(file);
-    settings.name = settings.name || path.basename(file, self.settings.extensionFileSuffix);
+  // If dir is a string convert ir to an array.
+  var dirs = (typeof dir === 'string') ? [dir] : dir;
 
-    // Set dependency chain merging dependencies and common dependencies if any.
-    // Clone settings.commonDependencies array to avoid affecting other
-    // applications.
-    settings.dependencyChain = self.settings.commonDependencies.concat([]);
-    if (settings.dependencies) {
-      settings.dependencies.forEach(function(dependency) {
-        if (settings.dependencyChain.indexOf(dependency) === -1) {
-          settings.dependencyChain.push(dependency);
-        }
-      });
-    }
+  // We loop dirs in series since order is important.
+  async.eachSeries(dirs, function(dir, next) {
 
-    // In the case we are enabling a module that's in setting.commonDependencies
-    // we need to remove the extension from it's own list of dependencies.
-    var index = settings.dependencyChain.indexOf(settings.name);
-    if (index !== -1) {
-      settings.dependencyChain.splice(index, 1);
-    }
+    // Scan directory for JSON files matching settings.extensionFileSuffix.
+    Prana.Extension.scan(dir, self.settings.extensionFileSuffix, function(file, data, next) {
 
-    // Add to found extensions.
-    foundExtensions[settings.name] = settings;
+      // Parse data and build extension settings.
+      try {
+        var settings = JSON.parse(data);
+        settings.path = path.dirname(file);
+        settings.name = settings.name || path.basename(file, self.settings.extensionFileSuffix);
+      } catch (err) {
+        return next(err);
+      }
 
-    next();
-  }, function(err) {
+      // Set dependency chain merging dependencies and common dependencies if any.
+      // Clone settings.commonDependencies array to avoid affecting other
+      // applications.
+      settings.dependencyChain = self.settings.commonDependencies.concat([]);
+      if (settings.dependencies) {
+        settings.dependencies.forEach(function(dependency) {
+          if (settings.dependencyChain.indexOf(dependency) === -1) {
+            settings.dependencyChain.push(dependency);
+          }
+        });
+      }
+
+      // In the case we are enabling a module that's in setting.commonDependencies
+      // we need to remove the extension from it's own list of dependencies.
+      var index = settings.dependencyChain.indexOf(settings.name);
+      if (index !== -1) {
+        settings.dependencyChain.splice(index, 1);
+      }
+
+      // Add to found extensions.
+      foundExtensions[settings.name] = settings;
+      next();
+    }, next);
+  }, function (err) {
     if (err) {
       return callback(err);
     }
@@ -238,7 +250,6 @@ Prana.prototype.loadExtensions = function(dir, callback) {
         // Allow extensions without a prototype. E.g. for feature extensions
         // that just have JSON files with some resources.
         settings.prototype = exists ? require(prototypeFile) : {};
-        foundExtensions[settings.name] = settings;
 
         // Add extension dependencies and initialization function to the
         // dependency chains, without changing settings.dependencyChain.
