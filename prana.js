@@ -45,7 +45,7 @@ var Prana = module.exports = function(settings) {
   // Add 'type' core type.
   this.type('type', {
     title: 'Type',
-    description: 'Types are the smallest thing on the system.',
+    description: 'Types are the smallest things on the system.',
     storageSettings: {
       // Set data as reference to this.types.
       data: this.types
