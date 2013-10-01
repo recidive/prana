@@ -320,7 +320,7 @@ Prana.prototype.invoke = function() {
       chains[extensionName] = settings.dependencyChain.concat([extensionInvoke]);
     }
     else {
-      // Module doesn't have any dependencies.
+      // Extension doesn't have any dependencies.
       chains[extensionName] = extensionInvoke;
     }
 
@@ -413,7 +413,7 @@ Prana.prototype.collect = function(type, data, callback) {
         chains[extensionName] = extension.settings.dependencyChain.concat([extensionInvoke]);
       }
       else {
-        // Module doesn't have any dependencies.
+        // Extension doesn't have any dependencies.
         chains[extensionName] = extensionInvoke;
       }
 
