@@ -291,21 +291,27 @@ Prana.prototype.loadExtensions = function(dir, callback) {
  */
 Prana.prototype.invoke = function() {
   var args = Array.prototype.slice.call(arguments);
+  var hook = args.shift();
   var callback = args.pop();
   var self = this;
   var chains = {};
 
-  async.map(Object.keys(this.extensions), function(extensionName, next) {
+  async.each(Object.keys(this.extensions), function(extensionName, next) {
     var extension = self.extensions[extensionName];
     var settings = extension.settings;
     var extensionInvoke = function(next) {
       // Make a copy of arguments to avoid appending all next callbacks to the
-      // main arguments object.
+      // main args object.
       var argsCopy = args.slice();
-      argsCopy.push(next);
 
-      // Invoke extension hook.
-      extension.invoke.apply(extension, argsCopy);
+      // Invoke extension hook implementation.
+      if (extension[hook] && typeof extension[hook] === 'function') {
+        argsCopy.push(next);
+        // Invoke hook implemetation and return.
+        return extension[hook].apply(extension, argsCopy);
+      }
+
+      next();
     };
 
     if (settings.dependencyChain) {
@@ -373,22 +379,52 @@ Prana.prototype.collect = function(type, data, callback) {
     // Process all items from JSON files.
     Prana.Type.processAll(type, result, data);
 
-    // Invoke type hooks on all modules.
-    self.invoke(type.name, data, function(err, hookData) {
+    // Invoke type hooks on all modules. We don't use invoke() here since we
+    // want data from previous hook invocation to be passed to the next hook
+    // implementation. This way the resources created by previous hook
+    // implementations can be modifyed by the dependent modules.
+    // Create a chain to call hooks in the order of dependency.
+    var chains = {};
+    async.each(Object.keys(self.extensions), function(extensionName, next) {
+      var extension = self.extensions[extensionName];
+
+      // The callback that will receive and process.
+      var extensionInvoke = function(next) {
+        if (!extension[type.name] || typeof extension[type.name] !== 'function') {
+          return next();
+        }
+
+        // Invoke type hook implemetation.
+        extension[type.name](data, function(err, newItems) {
+          if (err) {
+            return next(err);
+          }
+          if (newItems) {
+            // Process and include new items.
+            Prana.Type.processAll(type, newItems, data);
+          }
+          next();
+        });
+      };
+
+      if (extension.settings.dependencyChain) {
+        // Clone extension dependency chain and add invocation function to the
+        // dependency chains, without changing settings.dependencyChain.
+        chains[extensionName] = extension.settings.dependencyChain.concat([extensionInvoke]);
+      }
+      else {
+        // Module doesn't have any dependencies.
+        chains[extensionName] = extensionInvoke;
+      }
+
+      next();
+    }, function (err) {
       if (err) {
         return callback(err);
       }
 
-      if (hookData) {
-        // Each hook implemention can return many items.
-        for (var extensionName in hookData) {
-          // Process each set of items.
-          Prana.Type.processAll(type, hookData[extensionName], data);
-        }
-      }
-
-      callback(err);
+      // Execute all hooks taking into account module dependencies.
+      async.auto(chains, callback);
     });
-
   });
 };
