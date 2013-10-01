@@ -48,7 +48,7 @@ var cache = new Cache({
 cache.save();
 
 // Retrieve a list of cached data.
-Cache.list({}, function(err, items) {
+Cache.list({}, function(error, items) {
   console.log('A list of items');
   console.log(items);
 });

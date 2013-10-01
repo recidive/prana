@@ -21,7 +21,7 @@ var Cache = application.type('cache', {
 // List all types to see the type we created, the 'type' type is a core type.
 var Type = application.type('type');
 
-Type.list({}, function(err, items) {
+Type.list({}, function(error, items) {
   console.log('A list of types');
   console.log(Object.keys(items));
 });
@@ -48,25 +48,25 @@ otherCache.save();
 // You can also pass a conditions object as first argument to list(). The
 // Memory Storage engine only allows key as condition, e.g. {key: 'some-key'}.
 // Other storage engines allows complex queries to be performed.
-Cache.list({}, function(err, items) {
+Cache.list({}, function(error, items) {
   console.log('A list of items');
   console.log(items);
 });
 
 // Retrieve cached data.
-Cache.load('some-cache', function(err, item) {
+Cache.load('some-cache', function(error, item) {
   console.log('A single item');
   console.log(item);
 });
 
 // Delete cached data.
-Cache.delete('some-cache', function(err, item) {
+Cache.delete('some-cache', function(error, item) {
   console.log('Delete this single item');
   console.log(item);
 });
 
 // Retrieve a list of cached data again to check if the item was really removed.
-Cache.list({}, function(err, items) {
+Cache.list({}, function(error, items) {
   console.log('A list of items');
   console.log(items);
 });

@@ -16,16 +16,16 @@ describe('Model', function() {
       value: 'Some value'
     });
 
-    item.save(function(err) {
-      if (err) {
-        throw err;
+    item.save(function(error) {
+      if (error) {
+        throw error;
       }
 
       assert.ok(item);
 
-      SomeType.load(1, function(err, item) {
-        if (err) {
-          throw err;
+      SomeType.load(1, function(error, item) {
+        if (error) {
+          throw error;
         }
         assert.ok(item);
         assert.ok(item instanceof SomeType);
@@ -41,16 +41,16 @@ describe('Model', function() {
       value: 'Some value'
     });
 
-    item.save(function(err) {
-      if (err) {
-        throw err;
+    item.save(function(error) {
+      if (error) {
+        throw error;
       }
 
       assert.ok(item);
 
-      SomeType.list({}, function(err, items) {
-        if (err) {
-          throw err;
+      SomeType.list({}, function(error, items) {
+        if (error) {
+          throw error;
         }
         assert.ok(items);
         assert.ok(Object.keys(items).length > 0);
@@ -65,30 +65,30 @@ describe('Model', function() {
       value: 'Some value'
     });
 
-    item.save(function(err) {
-      if (err) {
-        throw err;
+    item.save(function(error) {
+      if (error) {
+        throw error;
       }
 
       assert.ok(item);
 
-      SomeType.load(3, function(err, item) {
-        if (err) {
-          throw err;
+      SomeType.load(3, function(error, item) {
+        if (error) {
+          throw error;
         }
         assert.ok(item);
         assert.ok(item instanceof SomeType);
         assert.ok(item instanceof Prana.Model);
 
-        item.delete(function(err, deletedItem) {
-          if (err) {
-            throw err;
+        item.delete(function(error, deletedItem) {
+          if (error) {
+            throw error;
           }
           assert.ok(deletedItem);
 
-          SomeType.load(3, function(err, absentItem) {
-            if (err) {
-              throw err;
+          SomeType.load(3, function(error, absentItem) {
+            if (error) {
+              throw error;
             }
             assert.ok(!absentItem);
             done();

@@ -29,9 +29,9 @@ application.extension('my-programmatic-extension', {
 });
 
 // Scan a folder for extensions.
-application.loadExtensions(__dirname + '/extensions', function(err, extensions) {
-  if (err) {
-    throw err;
+application.loadExtensions(__dirname + '/extensions', function(error, extensions) {
+  if (error) {
+    throw error;
   }
 
   console.log('Loaded %d extensions.', Object.keys(extensions).length);
@@ -45,7 +45,7 @@ application.loadExtensions(__dirname + '/extensions', function(err, extensions) 
     // above and the one created we have scanned. The 'extension' type is a
     // core type.
     var Extension = application.type('extension');
-    Extension.list({}, function(err, items) {
+    Extension.list({}, function(error, items) {
       console.log('A list of extensions');
       console.log(items);
 
@@ -53,7 +53,7 @@ application.loadExtensions(__dirname + '/extensions', function(err, extensions) 
       // by the scanned extensions. Just like the 'extension' type, the 'type'
       // type is a core type.
       var Type = application.type('type');
-      Type.list({}, function(err, items) {
+      Type.list({}, function(error, items) {
         console.log('A list of types');
         console.log(items);
       });
@@ -64,9 +64,9 @@ application.loadExtensions(__dirname + '/extensions', function(err, extensions) 
         key: 'test',
         title: 'Test'
       });
-      ExampleItem.save(function(err, item) {
+      ExampleItem.save(function(error, item) {
         // List Example items.
-        Example.list({}, function(err, items) {
+        Example.list({}, function(error, items) {
           console.log('A list of Example items');
           console.log(items);
         });
@@ -78,9 +78,9 @@ application.loadExtensions(__dirname + '/extensions', function(err, extensions) 
         key: 'test',
         title: 'Test'
       });
-      myProgrammaticExtensionTypeItem.save(function(err, item) {
+      myProgrammaticExtensionTypeItem.save(function(error, item) {
         // list MyProgrammaticExtensionType items.
-        MyProgrammaticExtensionType.list({}, function(err, items) {
+        MyProgrammaticExtensionType.list({}, function(error, items) {
           console.log('A list of MyProgrammaticExtensionType items');
           console.log(items);
         });
@@ -92,10 +92,10 @@ application.loadExtensions(__dirname + '/extensions', function(err, extensions) 
         key: 'test',
         title: 'Test'
       });
-      anotherExampleTypeItem.save(function(err, item) {
+      anotherExampleTypeItem.save(function(error, item) {
         console.log('Formatted item title, from a method added from type settings: ' + item.formattedTitle());
         // list MyProgrammaticExtensionType items.
-        AnotherExampleType.customList(function(err, items) {
+        AnotherExampleType.customList(function(error, items) {
           console.log('A custom list of AnotherExampleType items made from a static method added from type settings');
           console.log(items);
         });

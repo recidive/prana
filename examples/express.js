@@ -64,7 +64,7 @@ route.save();
 var server = express();
 
 // Retrieve and add all routes.
-Route.list({}, function(err, routes) {
+Route.list({}, function(error, routes) {
   console.log(routes);
   // Add all routes.
   for (var path in routes) {

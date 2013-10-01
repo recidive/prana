@@ -96,9 +96,9 @@ Prana.prototype.init = function(callback) {
     // vars were passed to storage settings.
     TypeModel.list({}, next);
   },
-  function(err, results) {
-    if (err) {
-      return callback(err);
+  function(error, results) {
+    if (error) {
+      return callback(error);
     }
 
     // Run init hook on all modules.
@@ -191,8 +191,8 @@ Prana.prototype.loadExtensions = function(dir, callback) {
         var settings = JSON.parse(data);
         settings.path = path.dirname(file);
         settings.name = settings.name || path.basename(file, self.settings.extensionFileSuffix);
-      } catch (err) {
-        return next(err);
+      } catch (error) {
+        return next(error);
       }
 
       // Set dependency chain merging dependencies and common dependencies if any.
@@ -218,9 +218,9 @@ Prana.prototype.loadExtensions = function(dir, callback) {
       foundExtensions[settings.name] = settings;
       next();
     }, next);
-  }, function (err) {
-    if (err) {
-      return callback(err);
+  }, function (error) {
+    if (error) {
+      return callback(error);
     }
 
     // If settings.extensions is not set, enabled all extensions found.
@@ -266,15 +266,15 @@ Prana.prototype.loadExtensions = function(dir, callback) {
         }]);
         next();
       });
-    }, function (err) {
-      if (err) {
-        return callback(err);
+    }, function (error) {
+      if (error) {
+        return callback(error);
       }
 
       // Execute all initialization functions declared above taking into
       // account module dependencies.
-      async.auto(chains, function(err) {
-        callback(err, enabledExtensions);
+      async.auto(chains, function(error) {
+        callback(error, enabledExtensions);
       });
     });
   });
@@ -325,9 +325,9 @@ Prana.prototype.invoke = function() {
     }
 
     next();
-  }, function (err) {
-    if (err) {
-      return callback(err);
+  }, function (error) {
+    if (error) {
+      return callback(error);
     }
 
     // Execute all hooks taking into account module dependencies.
@@ -359,9 +359,9 @@ Prana.prototype.collect = function(type, data, callback) {
 
     if (extension.settings.path) {
       // Scan for JSON files for this type.
-      Prana.Extension.scanItems(extension.settings.path, type.name, function(err, foundItems) {
-        if (err) {
-          return next(err);
+      Prana.Extension.scanItems(extension.settings.path, type.name, function(error, foundItems) {
+        if (error) {
+          return next(error);
         }
 
         if (foundItems) {
@@ -375,7 +375,7 @@ Prana.prototype.collect = function(type, data, callback) {
     else {
       next();
     }
-  }, function(err) {
+  }, function(error) {
     // Process all items from JSON files.
     Prana.Type.processAll(type, result, data);
 
@@ -395,9 +395,9 @@ Prana.prototype.collect = function(type, data, callback) {
         }
 
         // Invoke type hook implemetation.
-        extension[type.name](data, function(err, newItems) {
-          if (err) {
-            return next(err);
+        extension[type.name](data, function(error, newItems) {
+          if (error) {
+            return next(error);
           }
           if (newItems) {
             // Process and include new items.
@@ -418,9 +418,9 @@ Prana.prototype.collect = function(type, data, callback) {
       }
 
       next();
-    }, function (err) {
-      if (err) {
-        return callback(err);
+    }, function (error) {
+      if (error) {
+        return callback(error);
       }
 
       // Execute all hooks taking into account module dependencies.

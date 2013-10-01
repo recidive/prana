@@ -22,9 +22,9 @@ describe('Prana', function() {
 
     var Type = prana.type('type');
 
-    Type.load('someType', function(err, item) {
-      if (err) {
-        throw err;
+    Type.load('someType', function(error, item) {
+      if (error) {
+        throw error;
       }
       assert.ok(item);
       done();
@@ -46,9 +46,9 @@ describe('Prana', function() {
 
     var Extension = prana.type('extension');
 
-    Extension.load('some-extension', function(err, item) {
-      if (err) {
-        throw err;
+    Extension.load('some-extension', function(error, item) {
+      if (error) {
+        throw error;
       }
       assert.ok(item);
       assert.ok(item instanceof Prana.Extension);
