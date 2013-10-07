@@ -14,7 +14,7 @@ var Cache = application.type('cache', {
 
   // Those settings are the same as the defaults.
   path: 'cache',
-  storage: Prana.MemoryStorage,
+  storage: 'memory',
   keyProperty: 'key'
 });
 

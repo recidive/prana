@@ -34,44 +34,66 @@ var Prana = module.exports = function(settings) {
     utils.extend(this.settings, settings);
   }
 
+  var self = this;
+
+  // Add an shortcut to our default MemoryStorage.
+  this.memory = new Prana.MemoryStorage();
+
+  // Storages container. Start with the MemoryStorage that's the default and is
+  // required for types to work.
+  this.storages = {
+    'memory': this.memory
+  };
+
+  // Set the storage container for storages to this.storages, so the memory
+  // storage is available as soon as the 'storage' type is created bellow.
+  this.memory.data['storage'] = this.storages;
+
   // Types container.
   this.types = {};
-
-  // Extensions container.
-  this.extensions = {};
-
-  var self = this;
 
   // Add 'type' core type.
   this.type('type', {
     title: 'Type',
     description: 'Types are the smallest things on the system.',
-    storageSettings: {
-      // Set data as reference to this.types.
-      data: this.types
-    },
     process: function(name, settings) {
-      var controller = settings.controller || Prana.Type;
+      var controller = (settings && settings.controller) || Prana.Type;
       var typeObject = new controller(self, name, settings);
       return Prana.Model.compile(self, typeObject);
     },
     key: 'name'
   });
+  // Make the storage container for the 'type' type a reference to this.types,
+  // to make sure all types are added to it.
+  this.memory.data['type'] = this.types;
+
+  // Add 'storage' core type.
+  this.type('storage', {
+    title: 'Storage',
+    description: 'Resource storage mechanisms.',
+    process: function(name, settings) {
+      var controller = settings.controller || Prana.MemoryStorage;
+      return new controller(self, settings);
+    },
+    key: 'name'
+  });
+
+  // Extensions container.
+  this.extensions = {};
 
   // Add 'extension' core type.
   this.type('extension', {
     title: 'Extension',
     description: 'Extensions can extend every type on the system, as well as react on events.',
-    storageSettings: {
-      // Set data as reference to this.extensions.
-      data: this.extensions
-    },
     process: function(name, settings) {
       var controller = settings.controller || Prana.Extension;
       return new controller(self, name, settings);
     },
     key: 'name'
   });
+  // Make the storage container for the 'extension' type to a reference to
+  // this.extensions, to make sure all extensions are added to it.
+  this.memory.data['extension'] = this.extensions;
 };
 
 util.inherits(Prana, EventEmitter);
@@ -90,7 +112,8 @@ Prana.Extension = require('./lib/extension');
  */
 Prana.prototype.init = function(callback) {
   var self = this;
-  async.mapSeries(['extension', 'type'], function(typeName, next) {
+
+  async.mapSeries(['storage', 'type', 'extension'], function(typeName, next) {
     var TypeModel = self.type(typeName);
     // Just calling this will set this.extension and this.type vars since those
     // vars were passed to storage settings.
@@ -150,7 +173,7 @@ Prana.prototype.type = function(name, settings) {
 /**
  * Set or get an extension.
  *
- * @param {String} extension A string to be used to identify the extension.
+ * @param {String} name A string to be used to identify the extension.
  * @param {Object} settings Extension settings.
  * @return {Extension} Extension instance.
  */
@@ -163,6 +186,25 @@ Prana.prototype.extension = function(name, settings) {
   else {
     // Run the process function from the 'extension' type.
     return this.extensions[name] = this.types['extension'].type.process(name, settings);
+  }
+};
+
+/**
+ * Set or get an storage.
+ *
+ * @param {String} name A string to be used to identify the storage.
+ * @param {Object} settings Storage settings.
+ * @return {Object} Storage instance.
+ */
+Prana.prototype.storage = function(name, settings) {
+  // If there's no settings we want to get a extension.
+  if (!settings) {
+    // Return this as earlier as possible.
+    return this.storages[name];
+  }
+  else {
+    // Run the process function from the 'storage' type.
+    return this.storages[name] = this.types['storage'].type.process(name, settings);
   }
 };
 
