@@ -34,10 +34,13 @@ var Prana = module.exports = function(settings) {
     utils.extend(this.settings, settings);
   }
 
-  var self = this;
+  // Store a reference to memory storage data
+  this.data = {};
 
   // Add an shortcut to our default MemoryStorage.
-  this.memory = new Prana.MemoryStorage();
+  this.memory = new Prana.MemoryStorage(this, {
+    data: this.data
+  });
 
   // Storages container. Start with the MemoryStorage that's the default and is
   // required for types to work.
@@ -47,7 +50,9 @@ var Prana = module.exports = function(settings) {
 
   // Set the storage container for storages to this.storages, so the memory
   // storage is available as soon as the 'storage' type is created bellow.
-  this.memory.data['storage'] = this.storages;
+  this.data['storage'] = this.storages;
+
+  var self = this;
 
   // Types container.
   this.types = {};
@@ -65,7 +70,7 @@ var Prana = module.exports = function(settings) {
   });
   // Make the storage container for the 'type' type a reference to this.types,
   // to make sure all types are added to it.
-  this.memory.data['type'] = this.types;
+  this.data['type'] = this.types;
 
   // Add 'storage' core type.
   this.type('storage', {
@@ -93,7 +98,7 @@ var Prana = module.exports = function(settings) {
   });
   // Make the storage container for the 'extension' type to a reference to
   // this.extensions, to make sure all extensions are added to it.
-  this.memory.data['extension'] = this.extensions;
+  this.data['extension'] = this.extensions;
 };
 
 util.inherits(Prana, EventEmitter);
