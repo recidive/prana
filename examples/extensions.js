@@ -46,6 +46,10 @@ application.loadExtensions(__dirname + '/extensions', function(error, extensions
     // core type.
     var Extension = application.type('extension');
     Extension.list({}, function(error, items) {
+      if (error) {
+        throw error;
+      }
+
       console.log('A list of extensions');
       console.log(items);
 
