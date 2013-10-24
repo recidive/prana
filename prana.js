@@ -129,7 +129,7 @@ Prana.prototype.init = function(callback) {
       return callback(error);
     }
 
-    // Run init hook on all modules.
+    // Run init hook on all extensions.
     self.invoke('init', self, function() {
       callback.apply(self, results);
     })
