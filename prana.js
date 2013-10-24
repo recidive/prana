@@ -162,17 +162,15 @@ Prana.prototype.type = function(name, settings) {
     // Return this as earlier as possible.
     return this.types[name];
   }
-  else {
-    if (name === 'type') {
-      // We are creating the 'type' type, use process from settings.
-      return this.types[name] = settings.process(name, settings);
-    }
-    else {
-      // Run the process function from the 'type' type that's actually a model
-      // class instead of a type specific model instance.
-      return this.types[name] = this.types['type'].type.process(name, settings);
-    }
+
+  if (name === 'type') {
+    // We are creating the 'type' type, use process from settings.
+    return this.types[name] = settings.process(name, settings);
   }
+
+  // Run the process function from the 'type' type that's actually a model
+  // class instead of a type specific model instance.
+  return this.types[name] = this.types['type'].type.process(name, settings);
 };
 
 /**
@@ -188,10 +186,9 @@ Prana.prototype.extension = function(name, settings) {
     // Return this as earlier as possible.
     return this.extensions[name];
   }
-  else {
-    // Run the process function from the 'extension' type.
-    return this.extensions[name] = this.types['extension'].type.process(name, settings);
-  }
+
+  // Run the process function from the 'extension' type.
+  return this.extensions[name] = this.types['extension'].type.process(name, settings);
 };
 
 /**
@@ -207,10 +204,9 @@ Prana.prototype.storage = function(name, settings) {
     // Return this as earlier as possible.
     return this.storages[name];
   }
-  else {
-    // Run the process function from the 'storage' type.
-    return this.storages[name] = this.types['storage'].type.process(name, settings);
-  }
+
+  // Run the process function from the 'storage' type.
+  return this.storages[name] = this.types['storage'].type.process(name, settings);
 };
 
 /**
