@@ -65,8 +65,7 @@ var Prana = module.exports = function(settings) {
       var controller = (settings && settings.controller) || Prana.Type;
       var typeObject = new controller(self, name, settings);
       return Prana.Model.compile(self, typeObject);
-    },
-    key: 'name'
+    }
   });
   // Make the storage container for the 'type' type a reference to this.types,
   // to make sure all types are added to it.
@@ -79,8 +78,7 @@ var Prana = module.exports = function(settings) {
     process: function(name, settings) {
       var controller = settings.controller || Prana.MemoryStorage;
       return new controller(self, settings);
-    },
-    key: 'name'
+    }
   });
 
   // Extensions container.
@@ -93,8 +91,7 @@ var Prana = module.exports = function(settings) {
     process: function(name, settings) {
       var controller = settings.controller || Prana.Extension;
       return new controller(self, name, settings);
-    },
-    key: 'name'
+    }
   });
   // Make the storage container for the 'extension' type to a reference to
   // this.extensions, to make sure all extensions are added to it.
