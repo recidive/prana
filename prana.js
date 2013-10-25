@@ -119,10 +119,8 @@ Prana.prototype.init = function(callback) {
   var self = this;
 
   async.mapSeries(['storage', 'type', 'extension'], function(typeName, next) {
-    var TypeModel = self.type(typeName);
-    // Just calling this will set this.extension and this.type vars since those
-    // vars were passed to storage settings.
-    TypeModel.list({}, next);
+    // Load all data for 'storage', 'type' and 'extension'.
+    self.type(typeName).list({}, next);
   },
   function(error, results) {
     if (error) {
