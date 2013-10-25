@@ -29,7 +29,7 @@ You can then start adding objects of that type, in an active records fashion:
 ```js
 var MyType = application.type('myType');
 var myTypeInstance = new MyType({
-  key: 1,
+  name: 'some-item',
   someOtherProperty: 'The value of another property MyType has.'
 });
 myTypeInstance.save();
@@ -39,7 +39,7 @@ There's also the application.new() shortcut you can use to create new objects:
 
 ```js
 var myTypeInstance = application.new('myType', {
-  key: 1,
+  name: 'some-item',
   someOtherProperty: 'The value of another property MyType has.'
 });
 myTypeInstance.save();
@@ -88,7 +88,7 @@ Once save() method is called on a item all 'save' events are fired.
 ```js
 // Create a new Some Type item.
 var someTypeItem = new SomeType({
-  key: 'some-key',
+  name: 'some-name',
   value: 'some-value'
 });
 

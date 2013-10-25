@@ -8,11 +8,12 @@ describe('Prana', function() {
 
     var SomeType = prana.type('someType', {
       title: 'Some Type',
-      description: 'Some type for testing purposes.'
+      description: 'Some type for testing purposes.',
+      keyProperty: 'id'
     });
 
     var someItem = new SomeType({
-      key: 1,
+      id: 1,
       value: 'Some value'
     });
     assert.ok(someItem instanceof Prana.Model);

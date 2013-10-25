@@ -40,7 +40,7 @@ Cache.on('list', function(items) {
 
 // Create a new cache item.
 var cache = new Cache({
-  key: 'some-cache',
+  name: 'some-cache',
   value: 'some-cache-value'
 });
 

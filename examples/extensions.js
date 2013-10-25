@@ -65,7 +65,7 @@ application.loadExtensions(__dirname + '/extensions', function(error, extensions
       // Get 'example' type model created by the example.type.json file.
       var Example = application.type('example');
       var ExampleItem = new Example({
-        key: 'test',
+        name: 'test',
         title: 'Test'
       });
       ExampleItem.save(function(error, item) {
@@ -79,7 +79,7 @@ application.loadExtensions(__dirname + '/extensions', function(error, extensions
       // Get 'myProgrammaticExtensionType' type created by the extension.
       var MyProgrammaticExtensionType = application.type('myProgrammaticExtensionType');
       var myProgrammaticExtensionTypeItem = new MyProgrammaticExtensionType({
-        key: 'test',
+        name: 'test',
         title: 'Test'
       });
       myProgrammaticExtensionTypeItem.save(function(error, item) {
@@ -93,7 +93,7 @@ application.loadExtensions(__dirname + '/extensions', function(error, extensions
       // Get 'anotherExampleType' type created by the Example scanned extension.
       var AnotherExampleType = application.type('anotherExampleType');
       var anotherExampleTypeItem = new AnotherExampleType({
-        key: 'test',
+        name: 'test',
         title: 'Test'
       });
       anotherExampleTypeItem.save(function(error, item) {

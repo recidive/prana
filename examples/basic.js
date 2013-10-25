@@ -28,7 +28,7 @@ Type.list({}, function(error, items) {
 
 // Create a cache item.
 var cache = new Cache({
-  key: 'some-cache',
+  name: 'some-cache',
   value: 'some-cache-value'
 });
 
@@ -37,7 +37,7 @@ cache.save();
 
 // Create another cache item using the application.new() shorthand.
 var otherCache = application.new('cache', {
-  key: 'some-other-cache',
+  name: 'some-other-cache',
   value: 'some-other-cache-value'
 });
 

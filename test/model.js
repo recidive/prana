@@ -7,12 +7,13 @@ describe('Model', function() {
 
   var SomeType = prana.type('someType', {
     title: 'Some Type',
-    description: 'Some type for testing purposes.'
+    description: 'Some type for testing purposes.',
+    keyProperty: 'id'
   });
 
   it('should save and load an item', function(done) {
     var item = new SomeType({
-      key: 1,
+      id: 1,
       value: 'Some value'
     });
 
@@ -37,7 +38,7 @@ describe('Model', function() {
 
   it('should save and list items', function(done) {
     var item = new SomeType({
-      key: 2,
+      id: 2,
       value: 'Some value'
     });
 
@@ -61,7 +62,7 @@ describe('Model', function() {
 
   it('should save, load and delete an item', function(done) {
     var item = new SomeType({
-      key: 3,
+      id: 3,
       value: 'Some value'
     });
 
