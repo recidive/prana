@@ -29,7 +29,7 @@
         </ul>
       </header>
       <section>
-        <h1>
+<h1>
 <a name="prana" class="anchor" href="#prana"><span class="octicon octicon-link"></span></a>Prana</h1>
 
 <p>Prana is a general purpose microframework for building extensible, modular applications and frameworks with strong code reusability features.</p>
@@ -49,7 +49,7 @@
 
 <p>The Prana core is formed of types, events and extensions. You can define your own types, describing business objects of your application:</p>
 
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">Prana</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'prana'</span><span class="p">);</span>
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">Prana</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'prana'</span><span class="p">);</span>
 
 <span class="kd">var</span> <span class="nx">application</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Prana</span><span class="p">();</span>
 <span class="nx">application</span><span class="p">.</span><span class="nx">type</span><span class="p">(</span><span class="s1">'myType'</span><span class="p">,</span> <span class="p">{</span>
@@ -60,9 +60,9 @@
 
 <p>You can then start adding objects of that type, in an active records fashion:</p>
 
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">MyType</span> <span class="o">=</span> <span class="nx">application</span><span class="p">.</span><span class="nx">type</span><span class="p">(</span><span class="s1">'myType'</span><span class="p">);</span>
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">MyType</span> <span class="o">=</span> <span class="nx">application</span><span class="p">.</span><span class="nx">type</span><span class="p">(</span><span class="s1">'myType'</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">myTypeInstance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyType</span><span class="p">({</span>
-  <span class="nx">key</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="s1">'some-item'</span><span class="p">,</span>
   <span class="nx">someOtherProperty</span><span class="o">:</span> <span class="s1">'The value of another property MyType has.'</span>
 <span class="p">});</span>
 <span class="nx">myTypeInstance</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
@@ -70,8 +70,8 @@
 
 <p>There's also the application.new() shortcut you can use to create new objects:</p>
 
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">myTypeInstance</span> <span class="o">=</span> <span class="nx">application</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="s1">'myType'</span><span class="p">,</span> <span class="p">{</span>
-  <span class="nx">key</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">myTypeInstance</span> <span class="o">=</span> <span class="nx">application</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="s1">'myType'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="s1">'some-item'</span><span class="p">,</span>
   <span class="nx">someOtherProperty</span><span class="o">:</span> <span class="s1">'The value of another property MyType has.'</span>
 <span class="p">});</span>
 <span class="nx">myTypeInstance</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
@@ -79,7 +79,7 @@
 
 <p>In a similar way you save the item you can also get a list of items and also load a specific item from the storage:</p>
 
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">MyType</span> <span class="o">=</span> <span class="nx">application</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'myType'</span><span class="p">);</span>
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">MyType</span> <span class="o">=</span> <span class="nx">application</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'myType'</span><span class="p">);</span>
 <span class="nx">MyType</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">items</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Do something with items.</span>
 <span class="p">});</span>
@@ -97,7 +97,7 @@
 
 <p>There are list, load, save, delete events on both application and type scope.</p>
 
-<div class="highlight"><pre><span class="c1">// Global event listener.</span>
+<div class="highlight highlight-js"><pre><span class="c1">// Global event listener.</span>
 <span class="nx">application</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'save'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Global save event fired. Item type: '</span> <span class="o">+</span> <span class="nx">type</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'.'</span><span class="p">);</span>
 <span class="p">});</span>
@@ -116,9 +116,9 @@
 
 <p>Once save() method is called on a item all 'save' events are fired.</p>
 
-<div class="highlight"><pre><span class="c1">// Create a new Some Type item.</span>
+<div class="highlight highlight-js"><pre><span class="c1">// Create a new Some Type item.</span>
 <span class="kd">var</span> <span class="nx">someTypeItem</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SomeType</span><span class="p">({</span>
-  <span class="nx">key</span><span class="o">:</span> <span class="s1">'some-key'</span><span class="p">,</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="s1">'some-name'</span><span class="p">,</span>
   <span class="nx">value</span><span class="o">:</span> <span class="s1">'some-value'</span>
 <span class="p">});</span>
 
@@ -133,7 +133,7 @@
 
 <p>You can add extensions programmatically like this:</p>
 
-<div class="highlight"><pre><span class="c1">// The prototype of our programmatically created extension.</span>
+<div class="highlight highlight-js"><pre><span class="c1">// The prototype of our programmatically created extension.</span>
 <span class="kd">var</span> <span class="nx">myExtensionPrototype</span> <span class="o">=</span> <span class="p">{</span>
 
   <span class="c1">// The list hook allow you to alter every item on the system they get listed.</span>
@@ -158,13 +158,10 @@
 
 <p>You can also scan a directory for extensions:</p>
 
-<div class="highlight"><pre><span class="c1">// Scan a folder for extensions.</span>
-<span class="nx">Prana</span><span class="p">.</span><span class="nx">Extension</span><span class="p">.</span><span class="nx">scan</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/extensions'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">extensions</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// Add all found extensions.</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">extensionName</span> <span class="k">in</span> <span class="nx">extensions</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">settings</span> <span class="o">=</span> <span class="nx">extensions</span><span class="p">[</span><span class="nx">extensionName</span><span class="p">];</span>
-    <span class="nx">application</span><span class="p">.</span><span class="nx">extension</span><span class="p">(</span><span class="nx">extensionName</span><span class="p">,</span> <span class="nx">settings</span><span class="p">);</span>
-  <span class="p">}</span>
+<div class="highlight highlight-js"><pre><span class="c1">// Scan a folder for extensions and add them.</span>
+<span class="nx">application</span><span class="p">.</span><span class="nx">loadExtensions</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/extensions'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">extensions</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Do something with the just loaded extensions.</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Loaded %d extensions.'</span><span class="p">,</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">extensions</span><span class="p">).</span><span class="nx">length</span><span class="p">);</span>
 <span class="p">});</span>
 </pre></div>
 
@@ -175,7 +172,7 @@
 <h3>
 <a name="exampleextensionjson" class="anchor" href="#exampleextensionjson"><span class="octicon octicon-link"></span></a>example.extension.json</h3>
 
-<div class="highlight"><pre><span class="p">{</span>
+<div class="highlight highlight-json"><pre><span class="p">{</span>
   <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"Example Extension"</span><span class="p">,</span>
   <span class="nt">"description"</span><span class="p">:</span> <span class="s2">"This is just an example extension."</span>
 <span class="p">}</span>
@@ -184,7 +181,7 @@
 <h3>
 <a name="examplejs" class="anchor" href="#examplejs"><span class="octicon octicon-link"></span></a>example.js</h3>
 
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">example</span> <span class="o">=</span> <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">example</span> <span class="o">=</span> <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
 
   <span class="c1">// The list hook allow you to alter every item on the system they get listed.</span>
   <span class="nx">list</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">items</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
