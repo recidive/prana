@@ -1,10 +1,10 @@
 # Prana
 
-Prana is a general purpose microframework for building extensible, modular applications and frameworks with strong code reusability features.
+Prana is a general purpose microframework for building extensible applications and frameworks with strong code reusability features.
 
-Prana has some breakthrough concepts that abstract the small pieces common to every application. You can use Prana for building not only web applications but also other kind of applications, such as command line applications, sockets, etc.
+Prana has some breakthrough concepts that abstract the low level operations common to modern applications and provides an unified API for interacting with application resources, being them business rules or application data. You can use Prana to manipulate everything from application configuration settings to complex media objects.
 
-Prana provides an unified API for interacting with objects, from configuration settings, object metadata to complex media objects, everything can be created and manipulated with Prana.
+Prana combines a resource storage with an extensions system so every data that comes in and out through the storage can be manipulated by extensions that implement specific hooks.
 
 ## Installation
 
@@ -12,12 +12,12 @@ Prana provides an unified API for interacting with objects, from configuration s
 
 ## Basic usage
 
-The Prana core is formed of types, events and extensions. You can define your own types, describing business objects of your application:
+The Prana core is formed of types, storages and extensions. You can define your own types, describing business objects of your application:
 
 ```js
 var Prana = require('prana');
-
 var application = new Prana();
+
 application.type('myType', {
   title: 'My Type',
   description: 'This is one of my application types.'
@@ -28,10 +28,12 @@ You can then start adding objects of that type, in an active records fashion:
 
 ```js
 var MyType = application.type('myType');
+
 var myTypeInstance = new MyType({
   name: 'some-item',
   someOtherProperty: 'The value of another property MyType has.'
 });
+
 myTypeInstance.save();
 ```
 
@@ -42,6 +44,7 @@ var myTypeInstance = application.new('myType', {
   name: 'some-item',
   someOtherProperty: 'The value of another property MyType has.'
 });
+
 myTypeInstance.save();
 ```
 
@@ -49,9 +52,11 @@ In a similar way you save the item you can also get a list of items and also loa
 
 ```js
 var MyType = application.get('myType');
+
 MyType.list(function(err, items) {
   // Do something with items.
 });
+
 MyType.load(1, function(err, item) {
   // Do something with item.
 });
@@ -168,3 +173,7 @@ var example = module.exports = {
 ```
 
 For more examples check the examples folder.
+
+## Storages
+
+Prana comes with a build in Memory Storage. For persistent storage you can use the [MongoDB Storage](https://github.com/recidive/prana-mongodb) or write you own storage mechanism.
