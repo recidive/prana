@@ -466,3 +466,47 @@ Prana.prototype.collect = function(type, data, callback) {
     });
   });
 };
+
+/**
+ * List items from the storage.
+ *
+ * @param {String} typeName A type name string.
+ * @param {Object} query Query object with conditions and filters.
+ * @param {Function} callback Function to run when items are returned.
+ */
+Prana.prototype.list = function(typeName, query, callback) {
+  this.type(typeName).list(query, callback);
+};
+
+/**
+ * Load a single item from the storage.
+ *
+ * @param {String} typeName A type name string.
+ * @param {Mixed} key The key that represents the object to load.
+ * @param {Function} callback Function to run when the item is returned.
+ */
+Prana.prototype.load = function(typeName, key, callback) {
+  this.type(typeName).load(key, callback);
+};
+
+/**
+ * Save a item to the storage.
+ *
+ * @param {String} typeName A type name string.
+ * @param {Object} key Object with values for the object.
+ * @param {Function} callback Function to run when the item is saved.
+ */
+Prana.prototype.save = function(typeName, item, callback) {
+  this.type(typeName).save(item, callback);
+};
+
+/**
+ * Delete a single item from the storage.
+ *
+ * @param {String} typeName A type name string.
+ * @param {Mixed} key The key that represents the object to delete.
+ * @param {Function} callback Function to run when the item is deleted.
+ */
+Prana.prototype.delete = function(typeName, key, callback) {
+  this.type(typeName).delete(key, callback);
+};

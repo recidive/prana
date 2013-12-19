@@ -99,4 +99,42 @@ describe('Model', function() {
     });
   });
 
+  it('should save, load and delete an item using shortcuts', function(done) {
+    prana.save('someType', {
+      id: 4,
+      value: 'Some value'
+    }, function(error, item) {
+      if (error) {
+        throw error;
+      }
+      assert.ok(item);
+      assert.ok(item instanceof SomeType);
+      assert.ok(item instanceof Prana.Model);
+
+      prana.load('someType', 4, function(error, loadedItem) {
+        if (error) {
+          throw error;
+        }
+        assert.ok(loadedItem);
+        assert.ok(loadedItem instanceof SomeType);
+        assert.ok(loadedItem instanceof Prana.Model);
+
+        prana.delete('someType', 4, function(error, deletedItem) {
+          if (error) {
+            throw error;
+          }
+          assert.ok(deletedItem);
+
+          prana.load('someType', 4, function(error, absentItem) {
+            if (error) {
+              throw error;
+            }
+            assert.ok(!absentItem);
+            done();
+          });
+        });
+      });
+    });
+  });
+
 });
