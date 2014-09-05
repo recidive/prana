@@ -9,7 +9,7 @@ var example = module.exports = {
     var newTypes = {};
 
     // Show we can alter the type created by the JSON file on this same module.
-    types.example.propertyAddedFromSameModule = 'Some value';
+    types.example.title = 'Just a basic example type altered.';
 
     // Add a new type.
     newTypes['anotherExampleType'] = {
