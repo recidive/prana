@@ -414,8 +414,6 @@ Prana.prototype.collect = function(type, data, callback) {
       next();
     }
   }, function(error) {
-    // Process all items from JSON files.
-    Prana.Type.processAll(type, result, data);
 
     // Invoke type hooks on all modules. We don't use invoke() here since we
     // want data from previous hook invocation to be passed to the next hook
@@ -433,14 +431,13 @@ Prana.prototype.collect = function(type, data, callback) {
         }
 
         // Invoke type hook implemetation.
-        extension[type.name](data, function(error, newItems) {
+        extension[type.name](result, function(error, newItems) {
           if (error) {
             return next(error);
           }
-          if (newItems) {
-            // Process and include new items.
-            Prana.Type.processAll(type, newItems, data);
-          }
+
+          utils.extend(result, newItems || {});
+
           next();
         });
       };
@@ -462,7 +459,13 @@ Prana.prototype.collect = function(type, data, callback) {
       }
 
       // Execute all hooks taking into account module dependencies.
-      async.auto(chains, callback);
+      async.auto(chains, function () {
+
+        // Process and include new items.
+        Prana.Type.processAll(type, result, data);
+
+        callback();
+      });
     });
   });
 };
