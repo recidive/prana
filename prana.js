@@ -34,138 +34,28 @@ var Prana = module.exports = function(settings) {
     utils.extend(this.settings, settings);
   }
 
-  // Store a reference to memory storage data
-  this.data = {};
-
-  // Add an shortcut to our default MemoryStorage.
-  this.memory = new Prana.MemoryStorage(this, {
-    data: this.data
-  });
-
-  // Storages container. Start with the MemoryStorage that's the default and is
-  // required for types to work.
-  this.storages = {
-    'memory': this.memory
-  };
-
-  // Set the storage container for storages to this.storages, so the memory
-  // storage is available as soon as the 'storage' type is created bellow.
-  this.data['storage'] = this.storages;
-
-  var self = this;
-
-  // Types container.
-  this.types = {};
-
-  // Add 'type' core type.
-  this.type('type', {
-    title: 'Type',
-    description: 'Types are the smallest things on the system.',
-    process: function(name, settings) {
-      var controller = (settings && settings.controller) || Prana.Type;
-      var typeObject = new controller(self, name, settings);
-      return Prana.Model.compile(self, typeObject);
-    }
-  });
-  // Make the storage container for the 'type' type a reference to this.types,
-  // to make sure all types are added to it.
-  this.data['type'] = this.types;
-
-  // Add 'storage' core type.
-  this.type('storage', {
-    title: 'Storage',
-    description: 'Resource storage mechanisms.',
-    process: function(name, settings) {
-      var controller = settings.controller || Prana.MemoryStorage;
-      return new controller(self, settings);
-    }
-  });
-
   // Extensions container.
   this.extensions = {};
-
-  // Add 'extension' core type.
-  this.type('extension', {
-    title: 'Extension',
-    description: 'Extensions can extend every type on the system, as well as react on events.',
-    process: function(name, settings) {
-      var controller = settings.controller || Prana.Extension;
-      return new controller(self, name, settings);
-    }
-  });
-  // Make the storage container for the 'extension' type to a reference to
-  // this.extensions, to make sure all extensions are added to it.
-  this.data['extension'] = this.extensions;
 };
 
 util.inherits(Prana, EventEmitter);
 
 // Add components to Prana namespace.
 Prana.utils = require('./lib/utils');
-Prana.MemoryStorage = require('./lib/memory');
-Prana.Type = require('./lib/type');
-Prana.Model = require('./lib/model');
 Prana.Extension = require('./lib/extension');
 
 /**
- * Make sure all extensions and types are loaded.
+ * Call init hook on all extensions.
  *
  * @param {Function} callback Callback to run after prana was initialized.
  */
 Prana.prototype.init = function(callback) {
+  // Run init hook on all extensions.
+  // @todo: maybe it's not needed to pass this here.
   var self = this;
-
-  async.mapSeries(['storage', 'type', 'extension'], function(typeName, next) {
-    // Load all data for 'storage', 'type' and 'extension'.
-    self.type(typeName).list({}, next);
-  },
-  function(error, results) {
-    if (error) {
-      return callback(error);
-    }
-
-    // Run init hook on all extensions.
-    self.invoke('init', self, function() {
-      callback.apply(self, results);
-    })
+  this.invoke('init', this, function() {
+    callback.call(self, self.extensions);
   });
-};
-
-/**
- * Create new type specific objects.
- *
- * @param {String} type A type name string.
- * @param {Object} values Initial object values.
- * @return {Model} Actually an instance of a subclass of Model, the type
- *   specific model class instance.
- */
-Prana.prototype.new = function(type, values) {
-  var TypeModel = this.type(type);
-  return new TypeModel(values);
-};
-
-/**
- * Set or get a type.
- *
- * @param {String} name A string to be used to identify the type.
- * @param {Object} settings The settings for for the type to be created.
- * @return {Model} A Model subclass created exclusivelly for this type.
- */
-Prana.prototype.type = function(name, settings) {
-  // If there's no settings we want to get a type.
-  if (!settings) {
-    // Return this as earlier as possible.
-    return this.types[name];
-  }
-
-  if (name === 'type') {
-    // We are creating the 'type' type, use process from settings.
-    return this.types[name] = settings.process(name, settings);
-  }
-
-  // Run the process function from the 'type' type that's actually a model
-  // class instead of a type specific model instance.
-  return this.types[name] = this.types['type'].type.process(name, settings);
 };
 
 /**
@@ -176,32 +66,12 @@ Prana.prototype.type = function(name, settings) {
  * @return {Extension} Extension instance.
  */
 Prana.prototype.extension = function(name, settings) {
-  // If there's no settings we want to get a extension.
   if (!settings) {
-    // Return this as earlier as possible.
     return this.extensions[name];
   }
 
-  // Run the process function from the 'extension' type.
-  return this.extensions[name] = this.types['extension'].type.process(name, settings);
-};
-
-/**
- * Set or get an storage.
- *
- * @param {String} name A string to be used to identify the storage.
- * @param {Object} settings Storage settings.
- * @return {Object} Storage instance.
- */
-Prana.prototype.storage = function(name, settings) {
-  // If there's no settings we want to get a extension.
-  if (!settings) {
-    // Return this as earlier as possible.
-    return this.storages[name];
-  }
-
-  // Run the process function from the 'storage' type.
-  return this.storages[name] = this.types['storage'].type.process(name, settings);
+  var controller = settings.controller || Prana.Extension;
+  return this.extensions[name] = new controller(this, name, settings);
 };
 
 /**
@@ -256,7 +126,8 @@ Prana.prototype.loadExtensions = function(dir, callback) {
       foundExtensions[settings.name] = settings;
       next();
     }, next);
-  }, function (error) {
+  },
+  function (error) {
     if (error) {
       return callback(error);
     }
@@ -304,7 +175,8 @@ Prana.prototype.loadExtensions = function(dir, callback) {
         }]);
         next();
       });
-    }, function (error) {
+    },
+    function (error) {
       if (error) {
         return callback(error);
       }
@@ -363,7 +235,8 @@ Prana.prototype.invoke = function() {
     }
 
     next();
-  }, function (error) {
+  },
+  function (error) {
     if (error) {
       return callback(error);
     }
@@ -377,17 +250,11 @@ Prana.prototype.invoke = function() {
  * Collect data from JSON files and type specific hooks and add them to the data
  * container object.
  *
- * @param {Type} type Type object to collect data for.
- * @param {Object} data Data container object.
+ * @param {Type} string Type of data to collect items for.
  * @param {Function} callback Callback to run after all data have been
  *   collected.
  */
-Prana.prototype.collect = function(type, data, callback) {
-  // The extension type don't allow collecting.
-  if (type.name == 'extension') {
-    return callback();
-  }
-
+Prana.prototype.collect = function(type, callback) {
   var result = {};
   var self = this;
 
@@ -397,7 +264,7 @@ Prana.prototype.collect = function(type, data, callback) {
 
     if (extension.settings.path) {
       // Scan for JSON files for this type.
-      Prana.Extension.scanItems(extension.settings.path, type.name, function(error, foundItems) {
+      Prana.Extension.scanItems(extension.settings.path, type, function(error, foundItems) {
         if (error) {
           return next(error);
         }
@@ -413,12 +280,12 @@ Prana.prototype.collect = function(type, data, callback) {
     else {
       next();
     }
-  }, function(error) {
-
-    // Invoke type hooks on all modules. We don't use invoke() here since we
+  },
+  function(error) {
+    // Invoke type hooks on all extensions. We don't use invoke() here since we
     // want data from previous hook invocation to be passed to the next hook
     // implementation. This way the resources created by previous hook
-    // implementations can be modifyed by the dependent modules.
+    // implementations can be modifyed by the dependent exntensions.
     // Create a chain to call hooks in the order of dependency.
     var chains = {};
     async.each(Object.keys(self.extensions), function(extensionName, next) {
@@ -426,12 +293,12 @@ Prana.prototype.collect = function(type, data, callback) {
 
       // The callback that will receive and process.
       var extensionInvoke = function(next) {
-        if (!extension[type.name] || typeof extension[type.name] !== 'function') {
+        if (!extension[type] || typeof extension[type] !== 'function') {
           return next();
         }
 
         // Invoke type hook implemetation.
-        extension[type.name](result, function(error, newItems) {
+        extension[type](result, function(error, newItems) {
           if (error) {
             return next(error);
           }
@@ -453,63 +320,16 @@ Prana.prototype.collect = function(type, data, callback) {
       }
 
       next();
-    }, function (error) {
+    },
+    function (error) {
       if (error) {
         return callback(error);
       }
 
       // Execute all hooks taking into account module dependencies.
       async.auto(chains, function () {
-
-        // Process and include new items.
-        Prana.Type.processAll(type, result, data);
-
-        callback();
+        callback(null, result);
       });
     });
   });
-};
-
-/**
- * List items from the storage.
- *
- * @param {String} typeName A type name string.
- * @param {Object} query Query object with conditions and filters.
- * @param {Function} callback Function to run when items are returned.
- */
-Prana.prototype.list = function(typeName, query, callback) {
-  this.type(typeName).list(query, callback);
-};
-
-/**
- * Load a single item from the storage.
- *
- * @param {String} typeName A type name string.
- * @param {Mixed} key The key that represents the object to load.
- * @param {Function} callback Function to run when the item is returned.
- */
-Prana.prototype.load = function(typeName, key, callback) {
-  this.type(typeName).load(key, callback);
-};
-
-/**
- * Save a item to the storage.
- *
- * @param {String} typeName A type name string.
- * @param {Object} key Object with values for the object.
- * @param {Function} callback Function to run when the item is saved.
- */
-Prana.prototype.save = function(typeName, item, callback) {
-  this.type(typeName).save(item, callback);
-};
-
-/**
- * Delete a single item from the storage.
- *
- * @param {String} typeName A type name string.
- * @param {Mixed} key The key that represents the object to delete.
- * @param {Function} callback Function to run when the item is deleted.
- */
-Prana.prototype.delete = function(typeName, key, callback) {
-  this.type(typeName).delete(key, callback);
 };

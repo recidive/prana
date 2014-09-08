@@ -1,105 +1,18 @@
 # Prana
 
-Prana is a general purpose microframework for building extensible applications and frameworks with strong code reusability features.
+Prana is a microframework for building modular applications.
 
-Prana has some breakthrough concepts that abstract the low level operations common to modern applications and provides an unified API for interacting with application resources, being them business rules or application data. You can use Prana to manipulate everything from application configuration settings to complex media objects.
+Prana provides a declarative way of building all kind of application structures. You can use Prana to declare and manipulate everything from application settings to navigation structures.
 
-Prana combines a resource storage with an extensions system so every data that comes in and out through the storage can be manipulated by extensions that implement specific hooks.
+Prana has an extensions system and a data collector that helps with bringing organization, code reusability and extensibility to your project.
 
 ## Installation
 
     $ npm install prana
 
-## Basic usage
+## Examples
 
-The Prana core is formed of types, storages and extensions. You can define your own types, describing business objects of your application:
-
-```js
-var Prana = require('prana');
-var application = new Prana();
-
-application.type('myType', {
-  title: 'My Type',
-  description: 'This is one of my application types.'
-});
-```
-
-You can then start adding objects of that type, in an active records fashion:
-
-```js
-var MyType = application.type('myType');
-
-var myTypeInstance = new MyType({
-  name: 'some-item',
-  someOtherProperty: 'The value of another property MyType has.'
-});
-
-myTypeInstance.save();
-```
-
-There's also the application.new() shortcut you can use to create new objects:
-
-```js
-var myTypeInstance = application.new('myType', {
-  name: 'some-item',
-  someOtherProperty: 'The value of another property MyType has.'
-});
-
-myTypeInstance.save();
-```
-
-In a similar way you save the item you can also get a list of items and also load a specific item from the storage:
-
-```js
-var MyType = application.get('myType');
-
-MyType.list(function(err, items) {
-  // Do something with items.
-});
-
-MyType.load(1, function(err, item) {
-  // Do something with item.
-});
-```
-
-For more examples check the examples folder.
-
-## Events
-
-Both Prana instances (applications) and types are Event Emitters, this means you can add listeners to react on events emitted by these objects.
-
-There are list, load, save, delete events on both application and type scope.
-
-```js
-// Global event listener.
-application.on('save', function(type, item) {
-  console.log('Global save event fired. Item type: ' + type.name + '.');
-});
-
-// Define our type.
-var SomeType = application.type('someType', {
-  title: 'Some Type',
-  description: 'Some example type.'
-});
-
-// Type specific event listener.
-SomeType.on('save', function(item) {
-  console.log('Some Type specific save event fired.');
-});
-```
-
-Once save() method is called on a item all 'save' events are fired.
-
-```js
-// Create a new Some Type item.
-var someTypeItem = new SomeType({
-  name: 'some-name',
-  value: 'some-value'
-});
-
-// Save item to memory. Fire events.
-someTypeItem.save();
-```
+For examples check the [examples folder](https://github.com/recidive/prana/tree/master/examples).
 
 ## Extensions
 
@@ -172,8 +85,8 @@ var example = module.exports = {
 };
 ```
 
-For more examples check the examples folder.
+## Coding style
 
-## Storages
-
-Prana comes with a build in Memory Storage. For persistent storage you can use the [MongoDB Storage](https://github.com/recidive/prana-mongodb) or write you own storage mechanism.
+We try to conform to [Felix's Node.js Style Guide](https://github.com/felixge/node-style-guide)
+for all of our JavaScript code. For coding documentation we use [JSDoc](http://usejsdoc.org/)
+style.

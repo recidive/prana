@@ -2,43 +2,8 @@
  * Example extension prototype.
  */
 var example = module.exports = {
-
-  // The type() hook.
-  // The type() hook can be used to alter or add types.
-  type: function(types, callback) {
-    var newTypes = {};
-
-    // Show we can alter the type created by the JSON file on this same module.
-    types.example.title = 'Just a basic example type altered.';
-
-    // Add a new type.
-    newTypes['anotherExampleType'] = {
-      title: 'Another example type',
-      description: 'Another example type created by an extension.',
-      methods: {
-        formattedTitle: function() {
-          return '<h1>' + this.title + '</h1>';
-        }
-      },
-      statics: {
-        customList: function(callback) {
-          this.list({}, callback);
-        }
-      },
-      listeners: {
-        save: function(item) {
-          console.log('Event listener from type settings');
-          console.log('Item saved, type: ' + item.type.name);
-        }
-      }
-    };
-
-    callback(null, newTypes);
-  },
-
   // The example() hook.
-  // The example() hook can be used to alter/add examples. This is automatically
-  // created for the example type created by the example.type.json.
+  // The example() hook can be used to alter/add examples.
   example: function(examples, callback) {
     var newExamples = {};
 
