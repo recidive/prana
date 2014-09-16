@@ -36,6 +36,9 @@ var Prana = module.exports = function(settings) {
 
   // Extensions container.
   this.extensions = {};
+
+  // Cache container.
+  this.cache = {};
 };
 
 util.inherits(Prana, EventEmitter);
@@ -247,14 +250,35 @@ Prana.prototype.invoke = function() {
 };
 
 /**
+ * Get a single item from hooks and/or JSON file.
+ *
+ * @param {String} type Type of item to pick.
+ * @param {String} key Key of item to pick.
+ * @param {Function} callback Callback to run when item is retrieved.
+ */
+Prana.prototype.pick = function(type, key, callback) {
+  this.collect(type, function(error, items) {
+    if (error) {
+      return callback(error);
+    }
+    callback(null, items[key]);
+  });
+};
+
+/**
  * Collect data from JSON files and type specific hooks and add them to the data
  * container object.
  *
- * @param {Type} string Type of data to collect items for.
+ * @param {String} type Type of data to collect items for.
  * @param {Function} callback Callback to run after all data have been
  *   collected.
  */
 Prana.prototype.collect = function(type, callback) {
+  // If there are cached items for this type return them.
+  if (this.cache[type]) {
+    return callback(null, this.cache[type]);
+  }
+
   var result = {};
   var self = this;
 
@@ -284,8 +308,9 @@ Prana.prototype.collect = function(type, callback) {
   function(error) {
     // Invoke type hooks on all extensions. We don't use invoke() here since we
     // want data from previous hook invocation to be passed to the next hook
-    // implementation. This way the resources created by previous hook
-    // implementations can be modifyed by the dependent exntensions.
+    // implementation. This way items created by previous hook implementations
+    // can be modifyed by the dependent exntensions.
+
     // Create a chain to call hooks in the order of dependency.
     var chains = {};
     async.each(Object.keys(self.extensions), function(extensionName, next) {
@@ -328,8 +353,25 @@ Prana.prototype.collect = function(type, callback) {
 
       // Execute all hooks taking into account module dependencies.
       async.auto(chains, function () {
+        self.cache[type] = result;
         callback(null, result);
       });
     });
   });
+};
+
+/**
+ * Delete all items from the cache.
+ *
+ * @param {String} type Type of data to delete cache (optional).
+ */
+Prana.prototype.clear = function(type) {
+  if (!type) {
+    this.cache = {};
+    return;
+  }
+
+  if (type && this.cache[type]) {
+    delete this.cache[type];
+  }
 };
