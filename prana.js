@@ -353,9 +353,12 @@ Prana.prototype.collect = function(type, callback) {
 
       // Execute all hooks taking into account module dependencies.
       async.auto(chains, function () {
-        self.cache[type] = result;
-        callback(null, result);
+        self.invoke('collect', type, result, function() {
+          self.cache[type] = result;
+          callback(null, result);
+        });
       });
+
     });
   });
 };
