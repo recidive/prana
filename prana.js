@@ -106,9 +106,9 @@ Prana.prototype.loadExtensions = function(dir, callback) {
         return next(error);
       }
 
-      // Set dependency chain merging dependencies and common dependencies if any.
-      // Clone settings.commonDependencies array to avoid affecting other
-      // applications.
+      // Set dependency chain merging dependencies and common dependencies if
+      // any. Clone settings.commonDependencies array to avoid concatenating
+      // it accross extensions.
       settings.dependencyChain = self.settings.commonDependencies.concat([]);
       if (settings.dependencies) {
         settings.dependencies.forEach(function(dependency) {
