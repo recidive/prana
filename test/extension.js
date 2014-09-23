@@ -7,6 +7,21 @@ describe('Extension', function() {
   var extensionPrototype = {
     init: function(application, callback) {
       callback();
+    },
+
+    myInfo: function(data, callback) {
+      callback(null, {
+        'a-item': {
+          aProperty: 'a value'
+        }
+      });
+    },
+
+    collect: function(type, data, callback) {
+      if (type == 'myInfo') {
+        data['a-item'].anotherProperty = 'another value';
+      }
+      callback();
     }
   };
 
@@ -18,6 +33,24 @@ describe('Extension', function() {
 
   it('should initialize prana', function(done) {
     prana.init(function(extensions, types) {
+      done();
+    });
+  });
+
+  it('should collect items from a hook', function(done) {
+    prana.collect('myInfo', done);
+  });
+
+  it('should pick a item from a hook', function(done) {
+    prana.pick('myInfo', 'a-item', done);
+  });
+
+  it('should alter items using the collect() hook', function(done) {
+    prana.collect('myInfo', function(error, data) {
+      if (error) {
+        return done(error);
+      }
+      assert.equal('another value', data['a-item'].anotherProperty);
       done();
     });
   });
