@@ -1,22 +1,37 @@
 # Prana
 
-Prana is a microframework for building modular applications.
+Prana is a microframework for building modular and extensible [node.js](http://nodejs.org) applications.
 
-Prana provides a declarative way of building all kind of application structures. You can use Prana to declare and manipulate everything from application settings to navigation structures.
+It provides an extensions system that helps bringing organization, code reusability and extensibility to your project.
 
-Prana has an extensions system and a data collector that helps with bringing organization, code reusability and extensibility to your project.
+Extensions can implement hooks for adding their bits of functionality. Hooks can also be used for adding and modifying all kind of application metadata, such as settings, database schema and other application related metadata that can be extended.
+
+Prana also collects metadata from JSON files, so you can easily distribute your extensions with the metadata they need to run.
 
 ## Installation
 
     $ npm install prana
 
-## Examples
+## Getting started
 
-For examples check the [examples folder](https://github.com/recidive/prana/tree/master/examples).
+A very simple Prana application will look something like this:
+
+
+```js
+var Prana = require('prana');
+
+var app = new Prana();
+
+app.init(function(extensions) {
+  // Do some application specific stuff.
+});
+```
+
+For complete examples check the [examples folder](https://github.com/recidive/prana/tree/master/examples).
 
 ## Extensions
 
-Things start to get more interesting when we add some extensions to the loop.
+Extensions allow you to build reusable components that can be easily shared through applications or application instances.
 
 You can add extensions programmatically like this:
 
@@ -24,10 +39,11 @@ You can add extensions programmatically like this:
 // The prototype of our programmatically created extension.
 var myExtensionPrototype = {
 
-  // The list hook allow you to alter every item on the system they get listed.
-  list: function(type, items, callback) {
-    // Add a property to all types. You can use type to act only on certain
-    // items of a certain type.
+  // The collect hook allow you to alter items of all types when they get
+  // collected.
+  collect: function(type, items, callback) {
+    // Add a property to all types. You can use type to act only on items of a
+    // specific type.
     for (var itemKey in items) {
       items[itemKey].property = 'value';
     }
@@ -37,26 +53,26 @@ var myExtensionPrototype = {
 };
 
 // Add an extension programmatically.
-application.extension('my-extension', {
+app.extension('my-extension', {
   title: 'My Extension',
   description: 'This is just an example extension.',
   prototype: myExtensionPrototype
 });
 ```
 
-You can also scan a directory for extensions:
+But it's usually more useful having Prana scan a folder for extensions:
 
 ```js
-// Scan a folder for extensions and add them.
-application.loadExtensions(__dirname + '/extensions', function(err, extensions) {
+// Scan 'extensions' folder for extensions and add them.
+app.loadExtensions(__dirname + '/extensions', function(error, extensions) {
   // Do something with the just loaded extensions.
   console.log('Loaded %d extensions.', Object.keys(extensions).length);
 });
 ```
 
-This will look for two kind of files one named EXTENSIONNAME.extension.json that contains extension information. And EXTENSIONNAME.js that contains the extension protoype.
+This will recursively scans a folder named 'extensions' looking for two kind of files: one named `{extension-name}.extension.json` that contains extension information. And `{extension-name}.js` that contains the extension prototype.
 
-For example, you can have a folder called 'example' in the 'extensions' dir with example.extension.json and example.js files with the following content:
+For example, you can have a folder called `example` inside the `extensions` folder of your application with `example.extension.json` and `example.js` files in it with the following content:
 
 ### example.extension.json
 
@@ -72,8 +88,7 @@ For example, you can have a folder called 'example' in the 'extensions' dir with
 ```js
 var example = module.exports = {
 
-  // The list hook allow you to alter every item on the system they get listed.
-  list: function(type, items, callback) {
+  collect: function(type, items, callback) {
     // Add a property to all types. You can use type to act only on items of a
     // specific type.
     for (var itemKey in items) {
@@ -83,6 +98,47 @@ var example = module.exports = {
   }
 
 };
+```
+
+## Adding you own hooks
+
+To add your hooks you can just use the `invoke()` method and your hook will be called on all extensions:
+
+```js
+var example = module.exports = {
+
+  collect: function(type, items, callback) {
+    // Invoke itemsDecoratorHook() on all extensions.
+    // This is where we "create" our hook.
+    this.invoke('itemsDecoratorHook', items, callback);
+  },
+
+  itemsDecoratorHook: function(items, callback) {
+    // Add a property to all types. You can use type to act only on items of a
+    // specific type.
+    for (var itemKey in items) {
+      items[itemKey].property = 'value';
+    }
+    callback();
+  }
+
+};
+```
+
+## Collector hooks
+
+Collector hooks provides a clever way for collecting metadata from hooks and JSON files for using in your application. You can implement collector hooks by using the `collect()` and `pick()` methods:
+
+```js
+// Collect all items of type 'my-type'.
+app.collect('my-type', function(error, items) {
+  console.log(items);
+});
+
+// Pick a single item of type 'my-type' with key 'my-item-key'.
+app.pick('my-type', 'my-item-key', function(error, item) {
+  console.log(item);
+});
 ```
 
 ## Coding style
