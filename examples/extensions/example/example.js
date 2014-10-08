@@ -18,9 +18,9 @@ var example = module.exports = {
     callback(null, newExamples);
   },
 
-  // The list() hook.
-  // The list() hook can be used to alter/add items of all types.
-  list: function(type, items, callback) {
+  // The collect() hook.
+  // The collect() hook can be used to alter/add items of all types.
+  collect: function(type, items, callback) {
 
     // Add a property to all types. You can use type to act only on certain
     // items of a certain type.
