@@ -6,6 +6,7 @@ describe('Extension', function() {
 
   var extensionPrototype = {
     init: function(application, callback) {
+      assert.equal(prana, application);
       callback();
     },
 
