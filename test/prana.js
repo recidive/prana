@@ -35,7 +35,6 @@ describe('Prana', function() {
 
         // Retrieve all items of "test" type.
         prana.collect('test', function(error, tests) {
-          console.log(tests);
 
           assert.ok(Object.keys(tests).length > 0);
           assert.ok('test' in tests);
