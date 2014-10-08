@@ -1,4 +1,4 @@
-# Prana
+# ![Prana](http://pranajs.com/images/logo.png)
 
 Prana is a microframework for building modular and extensible [node.js](http://nodejs.org) applications.
 
