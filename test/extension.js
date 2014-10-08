@@ -5,18 +5,24 @@ describe('Extension', function() {
   var prana = new Prana();
 
   var extensionPrototype = {
-    // The type() hook.
-    type: function(types, callback) {
-      var newTypes = {};
+    init: function(application, callback) {
+      callback();
+    },
 
-      newTypes['testProgrammaticExtensionType'] = {
-        title: 'Test Programmatic Extension Type',
-        description: 'A type created by a programmatically added extension.'
-      };
+    myInfo: function(data, callback) {
+      callback(null, {
+        'a-item': {
+          aProperty: 'a value'
+        }
+      });
+    },
 
-      callback(null, newTypes);
+    collect: function(type, data, callback) {
+      if (type == 'myInfo') {
+        data['a-item'].anotherProperty = 'another value';
+      }
+      callback();
     }
-
   };
 
   var testProgramaticExtension = prana.extension('test-programatic-extension', {
@@ -25,11 +31,26 @@ describe('Extension', function() {
     prototype: extensionPrototype
   });
 
-  prana.init(function(extensions, types) {
-    it('should create an usable type', function(done) {
-      var TestProgrammaticExtensionType = prana.type('testProgrammaticExtensionType');
-      var testProgrammaticExtensionType = new TestProgrammaticExtensionType({key: 1, val: 2});
-      assert.ok(testProgrammaticExtensionType instanceof Prana.Model);
+  it('should initialize prana', function(done) {
+    prana.init(function(extensions, types) {
+      done();
+    });
+  });
+
+  it('should collect items from a hook', function(done) {
+    prana.collect('myInfo', done);
+  });
+
+  it('should pick a item from a hook', function(done) {
+    prana.pick('myInfo', 'a-item', done);
+  });
+
+  it('should alter items using the collect() hook', function(done) {
+    prana.collect('myInfo', function(error, data) {
+      if (error) {
+        return done(error);
+      }
+      assert.equal('another value', data['a-item'].anotherProperty);
       done();
     });
   });

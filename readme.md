@@ -1,109 +1,37 @@
 # Prana
 
-Prana is a general purpose microframework for building extensible applications and frameworks with strong code reusability features.
+Prana is a microframework for building modular and extensible [node.js](http://nodejs.org) applications.
 
-Prana has some breakthrough concepts that abstract the low level operations common to modern applications and provides an unified API for interacting with application resources, being them business rules or application data. You can use Prana to manipulate everything from application configuration settings to complex media objects.
+It provides an extensions system that helps bringing organization, code reusability and extensibility to your project.
 
-Prana combines a resource storage with an extensions system so every data that comes in and out through the storage can be manipulated by extensions that implement specific hooks.
+Extensions can implement hooks for adding their bits of functionality. Hooks can also be used for adding and modifying all kind of application metadata, such as settings, database schema and other application related metadata that can be extended.
+
+Prana also collects metadata from JSON files, so you can easily distribute your extensions with the metadata they need to run.
 
 ## Installation
 
     $ npm install prana
 
-## Basic usage
+## Getting started
 
-The Prana core is formed of types, storages and extensions. You can define your own types, describing business objects of your application:
+A very simple Prana application will look something like this:
+
 
 ```js
 var Prana = require('prana');
-var application = new Prana();
 
-application.type('myType', {
-  title: 'My Type',
-  description: 'This is one of my application types.'
+var app = new Prana();
+
+app.init(function(extensions) {
+  // Do some application specific stuff.
 });
 ```
 
-You can then start adding objects of that type, in an active records fashion:
-
-```js
-var MyType = application.type('myType');
-
-var myTypeInstance = new MyType({
-  name: 'some-item',
-  someOtherProperty: 'The value of another property MyType has.'
-});
-
-myTypeInstance.save();
-```
-
-There's also the application.new() shortcut you can use to create new objects:
-
-```js
-var myTypeInstance = application.new('myType', {
-  name: 'some-item',
-  someOtherProperty: 'The value of another property MyType has.'
-});
-
-myTypeInstance.save();
-```
-
-In a similar way you save the item you can also get a list of items and also load a specific item from the storage:
-
-```js
-var MyType = application.get('myType');
-
-MyType.list(function(err, items) {
-  // Do something with items.
-});
-
-MyType.load(1, function(err, item) {
-  // Do something with item.
-});
-```
-
-For more examples check the examples folder.
-
-## Events
-
-Both Prana instances (applications) and types are Event Emitters, this means you can add listeners to react on events emitted by these objects.
-
-There are list, load, save, delete events on both application and type scope.
-
-```js
-// Global event listener.
-application.on('save', function(type, item) {
-  console.log('Global save event fired. Item type: ' + type.name + '.');
-});
-
-// Define our type.
-var SomeType = application.type('someType', {
-  title: 'Some Type',
-  description: 'Some example type.'
-});
-
-// Type specific event listener.
-SomeType.on('save', function(item) {
-  console.log('Some Type specific save event fired.');
-});
-```
-
-Once save() method is called on a item all 'save' events are fired.
-
-```js
-// Create a new Some Type item.
-var someTypeItem = new SomeType({
-  name: 'some-name',
-  value: 'some-value'
-});
-
-// Save item to memory. Fire events.
-someTypeItem.save();
-```
+For complete examples check the [examples folder](https://github.com/recidive/prana/tree/master/examples).
 
 ## Extensions
 
-Things start to get more interesting when we add some extensions to the loop.
+Extensions allow you to build reusable components that can be easily shared through applications or application instances.
 
 You can add extensions programmatically like this:
 
@@ -111,10 +39,11 @@ You can add extensions programmatically like this:
 // The prototype of our programmatically created extension.
 var myExtensionPrototype = {
 
-  // The list hook allow you to alter every item on the system they get listed.
-  list: function(type, items, callback) {
-    // Add a property to all types. You can use type to act only on certain
-    // items of a certain type.
+  // The collect hook allow you to alter items of all types when they get
+  // collected.
+  collect: function(type, items, callback) {
+    // Add a property to all types. You can use type to act only on items of a
+    // specific type.
     for (var itemKey in items) {
       items[itemKey].property = 'value';
     }
@@ -124,26 +53,26 @@ var myExtensionPrototype = {
 };
 
 // Add an extension programmatically.
-application.extension('my-extension', {
+app.extension('my-extension', {
   title: 'My Extension',
   description: 'This is just an example extension.',
   prototype: myExtensionPrototype
 });
 ```
 
-You can also scan a directory for extensions:
+But it's usually more useful having Prana scan a folder for extensions:
 
 ```js
-// Scan a folder for extensions and add them.
-application.loadExtensions(__dirname + '/extensions', function(err, extensions) {
+// Scan 'extensions' folder for extensions and add them.
+app.loadExtensions(__dirname + '/extensions', function(error, extensions) {
   // Do something with the just loaded extensions.
   console.log('Loaded %d extensions.', Object.keys(extensions).length);
 });
 ```
 
-This will look for two kind of files one named EXTENSIONNAME.extension.json that contains extension information. And EXTENSIONNAME.js that contains the extension protoype.
+This will recursively scans a folder named 'extensions' looking for two kind of files: one named `{extension-name}.extension.json` that contains extension information. And `{extension-name}.js` that contains the extension prototype.
 
-For example, you can have a folder called 'example' in the 'extensions' dir with example.extension.json and example.js files with the following content:
+For example, you can have a folder called `example` inside the `extensions` folder of your application with `example.extension.json` and `example.js` files in it with the following content:
 
 ### example.extension.json
 
@@ -159,8 +88,7 @@ For example, you can have a folder called 'example' in the 'extensions' dir with
 ```js
 var example = module.exports = {
 
-  // The list hook allow you to alter every item on the system they get listed.
-  list: function(type, items, callback) {
+  collect: function(type, items, callback) {
     // Add a property to all types. You can use type to act only on items of a
     // specific type.
     for (var itemKey in items) {
@@ -172,8 +100,49 @@ var example = module.exports = {
 };
 ```
 
-For more examples check the examples folder.
+## Adding you own hooks
 
-## Storages
+To add your hooks you can just use the `invoke()` method and your hook will be called on all extensions:
 
-Prana comes with a build in Memory Storage. For persistent storage you can use the [MongoDB Storage](https://github.com/recidive/prana-mongodb) or write you own storage mechanism.
+```js
+var example = module.exports = {
+
+  collect: function(type, items, callback) {
+    // Invoke itemsDecoratorHook() on all extensions.
+    // This is where we "create" our hook.
+    this.invoke('itemsDecoratorHook', items, callback);
+  },
+
+  itemsDecoratorHook: function(items, callback) {
+    // Add a property to all types. You can use type to act only on items of a
+    // specific type.
+    for (var itemKey in items) {
+      items[itemKey].property = 'value';
+    }
+    callback();
+  }
+
+};
+```
+
+## Collector hooks
+
+Collector hooks provides a clever way for collecting metadata from hooks and JSON files for using in your application. You can implement collector hooks by using the `collect()` and `pick()` methods:
+
+```js
+// Collect all items of type 'my-type'.
+app.collect('my-type', function(error, items) {
+  console.log(items);
+});
+
+// Pick a single item of type 'my-type' with key 'my-item-key'.
+app.pick('my-type', 'my-item-key', function(error, item) {
+  console.log(item);
+});
+```
+
+## Coding style
+
+We try to conform to [Felix's Node.js Style Guide](https://github.com/felixge/node-style-guide)
+for all of our JavaScript code. For coding documentation we use [JSDoc](http://usejsdoc.org/)
+style.

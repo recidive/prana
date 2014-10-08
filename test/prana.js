@@ -3,36 +3,7 @@ var Prana = require('../prana');
 
 describe('Prana', function() {
 
-  it('should create a model for a type', function(done) {
-    var prana = new Prana();
-
-    var SomeType = prana.type('someType', {
-      title: 'Some Type',
-      description: 'Some type for testing purposes.',
-      keyProperty: 'id'
-    });
-
-    var someItem = new SomeType({
-      id: 1,
-      value: 'Some value'
-    });
-    assert.ok(someItem instanceof Prana.Model);
-
-    var SomeTypeAgain = prana.type('someType');
-    assert.equal(SomeTypeAgain, SomeType);
-
-    var Type = prana.type('type');
-
-    Type.load('someType', function(error, item) {
-      if (error) {
-        throw error;
-      }
-      assert.ok(item);
-      done();
-    });
-  });
-
-  it('should store an extension', function(done) {
+  it('should add an extension', function(done) {
     var prana = new Prana();
 
     var someExtension = prana.extension('some-extension', {
@@ -44,17 +15,7 @@ describe('Prana', function() {
 
     var someExtensionAgain = prana.extension('some-extension');
     assert.equal(someExtensionAgain, someExtension, 'Both extensions are the same.');
-
-    var Extension = prana.type('extension');
-
-    Extension.load('some-extension', function(error, item) {
-      if (error) {
-        throw error;
-      }
-      assert.ok(item);
-      assert.ok(item instanceof Prana.Extension);
-      done();
-    });
+    done();
   });
 
 });
