@@ -64,7 +64,7 @@ Prana.prototype.init = function(callback) {
 /**
  * Set or get an extension.
  *
- * @param {String} name A string to be used to identify the extension.
+ * @param {String} name A string used to identify the extension.
  * @param {Object} settings Extension settings.
  * @return {Extension} Extension instance.
  */

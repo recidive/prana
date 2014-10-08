@@ -32,7 +32,7 @@ application.loadExtensions(__dirname + '/extensions', function(error, extensions
 
     console.log('Initialized!');
 
-    // Retrieve all items from "example" type.
+    // Retrieve all items of "example" type.
     application.collect('example', function(error, examples) {
       console.log(examples);
     });
