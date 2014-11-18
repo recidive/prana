@@ -2,11 +2,11 @@
 
 Prana is a microframework for building modular and extensible [node.js](http://nodejs.org) applications.
 
-It provides an extensions system that helps bringing organization, code reusability and extensibility to your project.
+It provides an extensions system and metadata registry that help bringing organization, code reusability and extensibility to your project.
 
-Extensions can implement hooks for adding their bits of functionality. Hooks can also be used for adding and modifying all kind of application metadata, such as settings, database schema and other application related metadata that can be extended.
+Extensions implement hooks for adding their bits of functionality and all kinds of application metadata, such as settings, database schema and other data elements that can be extended.
 
-Prana also collects metadata from JSON files, so you can easily distribute your extensions with the metadata they need to run.
+Beside hooks, Prana also collects data elements from JSON files, so you can easily distribute your extensions with everything they need in order to run.
 
 ## Installation
 
@@ -31,7 +31,7 @@ For complete examples check the [examples folder](https://github.com/recidive/pr
 
 ## Extensions
 
-Extensions allow you to build reusable components that can be easily shared through applications or application instances.
+Extensions allow you to build reusable components that can be easily shared through applications and application instances and also be extended by other extensions.
 
 You can add extensions programmatically like this:
 
@@ -39,7 +39,17 @@ You can add extensions programmatically like this:
 // The prototype of our programmatically created extension.
 var myExtensionPrototype = {
 
-  // The collect hook allow you to alter items of all types when they get
+  // The myType() hook allow adding data elements for the 'myType' type and also
+  // altering the items created by other extensions.
+  myType: function(items, callback) {
+    var myTypeItems = {};
+    myTypeItems['some-item'] = {
+      title: 'Some item'
+    };
+    callback(null, myTypeItems);
+  },
+
+  // The collect() hook allow you altering items of all types when they get
   // collected.
   collect: function(type, items, callback) {
     // Add a property to all types. You can use type to act only on items of a
@@ -88,6 +98,7 @@ For example, you can have a folder called `example` inside the `extensions` fold
 ```js
 var example = module.exports = {
 
+  // The collect() hook.
   collect: function(type, items, callback) {
     // Add a property to all types. You can use type to act only on items of a
     // specific type.
@@ -125,24 +136,24 @@ var example = module.exports = {
 };
 ```
 
-## Collector hooks
+## Metadata registry
 
-Collector hooks provides a clever way for collecting metadata from hooks and JSON files for using in your application. You can implement collector hooks by using the `collect()` and `pick()` methods:
+For getting metadata from the application registry you can use the `collect()` and `pick()` methods. Data elements will then be collected from hooks and JSON files.
 
 ```js
-// Collect all items of type 'my-type'.
-app.collect('my-type', function(error, items) {
+// Collect all items of type 'myType'.
+app.collect('myType', function(error, items) {
   console.log(items);
 });
 
-// Pick a single item of type 'my-type' with key 'my-item-key'.
-app.pick('my-type', 'my-item-key', function(error, item) {
+// Pick a single item of type 'myType' with key 'some-item'.
+app.pick('myType', 'some-item', function(error, item) {
   console.log(item);
 });
 ```
 
+This is also how you add your own types. I.e. calling `collect('myType', ...)` or `pick('myType', ...)` will automatically create the `myType()` hook for you.
+
 ## Coding style
 
-We try to conform to [Felix's Node.js Style Guide](https://github.com/felixge/node-style-guide)
-for all of our JavaScript code. For coding documentation we use [JSDoc](http://usejsdoc.org/)
-style.
+We try to conform to [Felix's Node.js Style Guide](https://github.com/felixge/node-style-guide) for all of our JavaScript code. For coding documentation we use [JSDoc](http://usejsdoc.org/) style.
