@@ -111,7 +111,7 @@ var example = module.exports = {
 };
 ```
 
-## Adding you own hooks
+## Adding your own hooks
 
 To add your hooks you can just use the `invoke()` method and your hook will be called on all extensions:
 
